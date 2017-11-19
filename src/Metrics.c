@@ -66,3 +66,13 @@ int GetPieceTextTop(struct Metrics* pMetrics,int x, int y)
    return GetPieceTop(pMetrics, x, y) + 5;
 }
 
+int GetPieceValueTextLeft(struct Metrics* pMetrics, int x, int y)
+{
+   return GetPieceLeft(pMetrics, x, y) + GetPieceWidth(pMetrics, x, y)/2 - 4;
+}
+
+int GetPieceValueTextTop(struct Metrics* pMetrics, int x, int y)
+{
+   return GetPieceTop(pMetrics, x, y) + GetPieceHeight(pMetrics, x, y)/2 - 4;
+}
+

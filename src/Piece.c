@@ -1,16 +1,12 @@
 #include "Piece.h"
 
 #include "Font.h"
+#include "Replacements.h"
 
 #define PIECE_BORDER_SIZE	(4)
 
-#define USE_DIFFERENT_FONT
-
-#ifdef USE_DIFFERENT_FONT
-static Font* g_pFontBig = NULL;
-static Font* g_pFontUsed = NULL;
-#endif
 static Font* g_pFont = NULL;
+static Font* g_pFontError = NULL;
 
 void CreatePiece(struct Piece* pPiece, int x, int y, KenKenLib kenken, struct Metrics* pMetrics, struct Config* pConfig)
 {
@@ -21,11 +17,11 @@ void CreatePiece(struct Piece* pPiece, int x, int y, KenKenLib kenken, struct Me
    pPiece->m_pConfig = pConfig;
 
    if( g_pFont == NULL ) {
-#ifdef USE_DIFFERENT_FONT
-      g_pFontBig = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 255/*G*/, 255/*B*/, 12);
-      g_pFontUsed = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
-#endif
-      g_pFont = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 127/*R*/, 127/*G*/, 127/*B*/, 12);
+      g_pFont = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 0/*R*/, 0/*G*/, 0/*B*/, 12);
+   }
+
+   if (g_pFontError == NULL) {
+      g_pFontError = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
    }
 }
 
@@ -36,15 +32,13 @@ void FreePiece(struct Piece* pPiece)
    pPiece->m_pConfig = NULL;//Does not own
 
    if( g_pFont != NULL ) {
-#ifdef USE_DIFFERENT_FONT
-      FreeFont(g_pFontBig);
-      g_pFontBig = NULL;
-      FreeFont(g_pFontUsed);
-      g_pFontUsed = NULL;
-#endif
-
       FreeFont(g_pFont);
       g_pFont = NULL;
+   }
+
+   if (g_pFontError != NULL) {
+      FreeFont(g_pFontError);
+      g_pFontError = NULL;
    }
 }
 
@@ -99,11 +93,10 @@ void PieceDraw(struct Piece* pPiece, struct SDL_Surface* pScreen)
 
    SDL_FillRect(pScreen, &rect, SDL_MapRGB(pScreen->format, r, g, b));
 
+   static char buffer[5];
+
    if (IsDisplayEquationSpot(pPiece->m_KenKen, pPiece->m_nX, pPiece->m_nY) == 1)
    {
-      static char buffer[2];
-      buffer[1] = '\0';
-
       int top = GetPieceTextTop(pPiece->m_pMetrics, pPiece->m_nX, pPiece->m_nY);
       int left = GetPieceTextLeft(pPiece->m_pMetrics, pPiece->m_nX, pPiece->m_nY);
 
@@ -111,26 +104,42 @@ void PieceDraw(struct Piece* pPiece, struct SDL_Surface* pScreen)
 
       if (nNumber > -1)
       {
-         buffer[0] = nNumber + '0';
+         IntToA(buffer, 4, nNumber);
+
+         enum MathOperation eOperation = GetKenKenEquationType(pPiece->m_KenKen, pPiece->m_nX, pPiece->m_nY);
+         if( eOperation == Add )
+            StringAppend(buffer, 4, "+");
+         else if (eOperation == Subtract)
+            StringAppend(buffer, 4, "-");
+         if (eOperation == Multiply)
+            StringAppend(buffer, 4, "x");
+         if (eOperation == Divide)
+            StringAppend(buffer, 4, "/");
 
          Font* pFont = g_pFont;
          int nR = 0, nG = 0, nB = 0;
-         //#ifdef USE_DIFFERENT_FONT
-         //#ifdef _TINSPIRE
-         //          && GetLockHint(pPiece->m_pConfig) == 1 
-         //#endif
-         //         ) {
-         //         pFont = g_pFontUsed;
-         //         nR = 255, nG = 0, nB = 0;
-         //      }
-         //      else if( i == 0 ) {
-         //         pFont = g_pFontBig;
-         //         nR = 255, nG = 255, n = 255;
-         //      }
-         //#endif
 
          DrawText(pScreen, pFont, left, top, buffer, nR, nG, nB);
       }
+   }
+
+   int nSpotValue = GetKenKenSpotValue(pPiece->m_KenKen, pPiece->m_nX, pPiece->m_nY);
+   if (nSpotValue > 0)
+   {
+      IntToA(buffer, 4, nSpotValue);
+
+      int top = GetPieceValueTextTop(pPiece->m_pMetrics, pPiece->m_nX, pPiece->m_nY);
+      int left = GetPieceValueTextLeft(pPiece->m_pMetrics, pPiece->m_nX, pPiece->m_nY);
+
+      Font* pFont = g_pFont;
+      int nR = 0, nG = 0, nB = 0;
+      if (IsKenKenUniqueValueForRowColumn(pPiece->m_KenKen, pPiece->m_nX, pPiece->m_nY) == KENKENLIB_NOT_UNIQUE_VALUE)
+      {
+         pFont = g_pFontError;
+         nR = 255;
+      }
+
+      DrawText(pScreen, pFont, left, top, buffer, nR, nG, nB);
    }
 }
 

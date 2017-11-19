@@ -88,14 +88,14 @@ void DrawBoard(struct Game* pGame)
    //Draw selector
    DrawSelector(pGame->m_pSelector);
    
-   /*if( pGame->m_bWon == 1 ) {
+   if( pGame->m_bWon == 1 ) {
       SDL_Rect rectYouWin;
       rectYouWin.x = (SCREEN_WIDTH - pGame->m_pYouWinGraphic->w)/2;
       rectYouWin.y = (SCREEN_HEIGHT - pGame->m_pYouWinGraphic->h)/2;
       rectYouWin.w = pGame->m_pYouWinGraphic->w;
       rectYouWin.h = pGame->m_pYouWinGraphic->h;
       SDL_BlitSurface(pGame->m_pYouWinGraphic, NULL, pGame->m_pScreen, &rectYouWin);
-   }*/
+   }
 #endif
    
    SDL_UpdateRect(pGame->m_pScreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -154,6 +154,23 @@ int GamePollEvents(struct Game* pGame)
 		     pGame->m_bWon = IsKenKenGameOver(pGame->m_KenKen);
 		     UpdateGameWon(pGame);
 		  }
+                  break;
+
+               case SDLK_0:
+               case SDLK_1:
+               case SDLK_2:
+               case SDLK_3:
+               case SDLK_4:
+               case SDLK_5:
+               case SDLK_6:
+               case SDLK_7:
+               case SDLK_8:
+               case SDLK_9:
+                  if (pGame->m_bWon != 1) {
+                     SetKenKenSpotValue(pGame->m_KenKen, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), event.key.keysym.sym - SDLK_0);
+                     pGame->m_bWon = IsKenKenGameOver(pGame->m_KenKen);
+                     UpdateGameWon(pGame);
+                  }
                   break;
 
                case SDLK_LSHIFT:

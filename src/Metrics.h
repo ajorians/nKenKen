@@ -23,6 +23,8 @@ int GetPieceWidth(struct Metrics* pMetrics, int x, int y);
 int GetPieceHeight(struct Metrics* pMetrics, int x, int y);
 int GetPieceTextLeft(struct Metrics* pMetrics,int x, int y);
 int GetPieceTextTop(struct Metrics* pMetrics,int x, int y);
+int GetPieceValueTextLeft(struct Metrics* pMetrics, int x, int y);
+int GetPieceValueTextTop(struct Metrics* pMetrics, int x, int y);
 
 #endif
 

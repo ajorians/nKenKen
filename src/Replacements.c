@@ -25,3 +25,12 @@ void StringCopy(char* pstrOutput, int bufferSize, char* pstrInput)
 #endif
 }
 
+void StringAppend(char* pstrBuffer, int nSize, char* pstrAddition)
+{
+#ifdef _TINSPIRE
+   strcat(pstrBuffer, pstrAddition);
+#else
+   strcat_s(pstrBuffer, nSize, pstrAddition);
+#endif
+}
+

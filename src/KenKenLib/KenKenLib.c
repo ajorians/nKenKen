@@ -67,6 +67,7 @@ struct KenKenEquation* GetEquation(struct KenKenEquation* pEquation, int nID)
 struct KenKen
 {
    int m_nLastError;
+   int m_nNumEquations;
    struct KenKenBoard* m_pBoard;
    struct KenKenEquation* m_pEquations;
 };
@@ -126,8 +127,6 @@ int KenKenLibCreate(KenKenLib* api, const char* pstrFile)
    char buffer[16];
    int nSpotInBuffer = 0;
 
-   int nSpotInMessage = 0;
-
    int nWidth = -1, nHeight = -1;
    int nNumEquations = -1;
    //int nShowOperations = -1, nKenDoKu = -1;
@@ -156,6 +155,7 @@ int KenKenLibCreate(KenKenLib* api, const char* pstrFile)
             }
 #endif
             nNumEquations = nValue;
+            pK->m_nNumEquations = nNumEquations;
             pK->m_pEquations = malloc(sizeof(struct KenKenEquation)*nNumEquations);
 
             for (int nEquation = 0; nEquation < nNumEquations; nEquation++) {
@@ -341,13 +341,60 @@ int IsKenKenGameOver(KenKenLib api)
       for (y = 0; y < pK->m_pBoard->m_nHeight; y++)
       {
          struct Cell* pCell = GetAt(pK->m_pBoard, x, y);
-         if (pCell->m_nValue == 0)
+         if (pCell->m_nValue <= 0)
             return KENKENLIB_NOT_GAMEOVER;
       }
    }
 
+   for (x = 0; x < pK->m_pBoard->m_nWidth; x++)
+   {
+      for (y = 0; y < pK->m_pBoard->m_nHeight; y++)
+      {
+         if (IsKenKenUniqueValueForRowColumn(api, x, y) == KENKENLIB_NOT_UNIQUE_VALUE)
+            return KENKENLIB_NOT_GAMEOVER;
+      }
+   }
+
+   //Check equations are satified
+   for (x = 0; x < pK->m_nNumEquations; x++)
+   {
+      if (IsKenKenEquationSolved(api, x) == KENKENLIB_EQUATION_NOT_SOLVED)
+         return KENKENLIB_NOT_GAMEOVER;
+   }
+
    //printf("Game over\n");
    return KENKENLIB_GAMEOVER;
+}
+
+int GetKenKenSpotValue(KenKenLib api, int x, int y)
+{
+   struct KenKen* pK;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+
+   if (x < 0 || x >= pK->m_pBoard->m_nWidth || y < 0 || y >= pK->m_pBoard->m_nHeight)
+      return KENKENLIB_BADARGUMENT;
+
+   return GetAt(pK->m_pBoard, x, y)->m_nValue;
+}
+
+int SetKenKenSpotValue(KenKenLib api, int x, int y, int value)
+{
+   struct KenKen* pK;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+
+   if (x < 0 || x >= pK->m_pBoard->m_nWidth || y < 0 || y >= pK->m_pBoard->m_nHeight)
+      return KENKENLIB_BADARGUMENT;
+
+   if (value < 0 || value > pK->m_pBoard->m_nWidth)
+      return KENKENLIB_BADARGUMENT;
+
+   GetAt(pK->m_pBoard, x, y)->m_nValue = value;
+
+   return KENKENLIB_OK;
 }
 
 int KenKenSpotShareSameEquation(KenKenLib api, int x1, int y1, int x2, int y2)
@@ -377,6 +424,190 @@ int GetKenKenEquationValue(KenKenLib api, int x, int y)
 
    pEquation = GetAt(pK->m_pBoard, x, y)->m_pEquation;
    return pEquation ? pEquation->m_nValue : -1;
+}
+
+int IsKenKenUniqueValueForRowColumn(KenKenLib api, int nX, int nY)
+{
+   struct KenKen* pK;
+   int x, y;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+   for (x = 0; x < pK->m_pBoard->m_nWidth; x++)
+   {
+      if (x == nX)
+         continue;
+
+      if (GetAt(pK->m_pBoard, x, nY)->m_nValue == GetAt(pK->m_pBoard, nX, nY)->m_nValue)
+      {
+         return KENKENLIB_NOT_UNIQUE_VALUE;
+      }
+   }
+
+   for (y = 0; y < pK->m_pBoard->m_nHeight; y++)
+   {
+      if (y == nY)
+         continue;
+
+      if (GetAt(pK->m_pBoard, nX, y)->m_nValue == GetAt(pK->m_pBoard, nX, nY)->m_nValue)
+      {
+         return KENKENLIB_NOT_UNIQUE_VALUE;
+      }
+   }
+
+   return KENKENLIB_UNIQUE_VALUE;
+}
+
+int GetNumKenKenEquations(KenKenLib api)
+{
+   struct KenKen* pK;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+   return pK->m_nNumEquations;
+}
+
+/* arr[]  ---> Input Array
+n      ---> Size of input array
+r      ---> Size of a combination to be printed
+index  ---> Current index in data[]
+data[] ---> Temporary array to store current combination
+i      ---> index of current element in arr[]     */
+int combinationSubtraction(int arr[], int n, int r, int index, int data[], int i, int nEquationValue)
+{
+   // Current cobination is ready, print it
+   if (index == r)
+   {
+      int nResult = data[0];
+      for (int j = 1; j < r; j++)
+         nResult -= data[j];
+      
+      return nResult == nEquationValue;
+   }
+
+   // When no more elements are there to put in data[]
+   if (i >= n)
+      return 0;
+
+   // current is included, put next at next location
+   data[index] = arr[i];
+   if (1 == combinationSubtraction(arr, n, r, index + 1, data, i + 1, nEquationValue))
+      return 1;
+
+   // current is excluded, replace it with next (Note that
+   // i+1 is passed, but index is not changed)
+   return combinationSubtraction(arr, n, r, index, data, i + 1, nEquationValue);
+}
+
+/* arr[]  ---> Input Array
+n      ---> Size of input array
+r      ---> Size of a combination to be printed
+index  ---> Current index in data[]
+data[] ---> Temporary array to store current combination
+i      ---> index of current element in arr[]     */
+int combinationDivision(int arr[], int n, int r, int index, int data[], int i, int nEquationValue)
+{
+   // Current cobination is ready, print it
+   if (index == r)
+   {
+      int nResult = data[0];
+      for (int j = 1; j < r; j++)
+      {
+         if (data[j] == 0)
+            return 0;
+         nResult /= data[j];
+      }
+
+      return nResult == nEquationValue;
+   }
+
+   // When no more elements are there to put in data[]
+   if (i >= n)
+      return 0;
+
+   // current is included, put next at next location
+   data[index] = arr[i];
+   if (1 == combinationDivision(arr, n, r, index + 1, data, i + 1, nEquationValue))
+      return 1;
+
+   // current is excluded, replace it with next (Note that
+   // i+1 is passed, but index is not changed)
+   return combinationDivision(arr, n, r, index, data, i + 1, nEquationValue);
+}
+
+int IsKenKenEquationSolved(KenKenLib api, int nIndex)
+{
+   struct KenKen* pK;
+   struct KenKenEquation* pEquation;
+   int x, y;
+   int nCount = 0;
+   static int arrSpotValues[10 * 10];
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+
+   pEquation = GetEquation(pK->m_pEquations, nIndex);
+
+   for (x = 0; x < pK->m_pBoard->m_nWidth; x++)
+   {
+      for (y = 0; y < pK->m_pBoard->m_nHeight; y++)
+      {
+         if (GetAt(pK->m_pBoard, x, y)->m_pEquation == pEquation)
+         {
+            int nSpotValue = GetKenKenSpotValue(api, x, y);
+            if (nSpotValue <= 0)
+               return KENKENLIB_EQUATION_NOT_SOLVED;
+
+            arrSpotValues[nCount++] = nSpotValue;
+         }
+      }
+   }
+
+   if (pEquation->m_eOperation == Add)
+   {
+      int nSum = 0;
+      for (x = 0; x < nCount; x++)
+         nSum += arrSpotValues[x];
+
+      if( nSum != pEquation->m_nValue )
+         return KENKENLIB_EQUATION_NOT_SOLVED;
+   }
+   if (pEquation->m_eOperation == Subtract)
+   {
+      int data[10 * 10];
+      if (combinationSubtraction(arrSpotValues, nCount, nCount, 0, data, 0, pEquation->m_nValue ) == 0 )
+         return KENKENLIB_EQUATION_NOT_SOLVED;
+   }
+   else if (pEquation->m_eOperation == Multiply)
+   {
+      int nProduct = 0;
+      for (x = 0; x < nCount; x++)
+         nProduct *= arrSpotValues[x];
+
+      if (nProduct != pEquation->m_nValue)
+         return KENKENLIB_EQUATION_NOT_SOLVED;
+   }
+   if (pEquation->m_eOperation == Divide)
+   {
+      int data[10 * 10];
+      if (combinationDivision(arrSpotValues, nCount, nCount, 0, data, 0, pEquation->m_nValue) == 0)
+         return KENKENLIB_EQUATION_NOT_SOLVED;
+   }
+
+   return KENKENLIB_EQUATION_SOLVED;
+}
+
+enum MathOperation GetKenKenEquationType(KenKenLib api, int x, int y)
+{
+   struct KenKen* pK;
+   struct KenKenEquation* pEquation;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+
+   pEquation = GetAt(pK->m_pBoard, x, y)->m_pEquation;
+
+   return pEquation->m_eOperation;
 }
 
 

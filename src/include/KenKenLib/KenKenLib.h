@@ -15,6 +15,12 @@ typedef void* KenKenLib;
 #define KENKENLIB_SHARE_EQUATION (1)
 #define KENKENLIB_NOT_SHARE_EQUATION (0)
 
+#define KENKENLIB_UNIQUE_VALUE  (1)
+#define KENKENLIB_NOT_UNIQUE_VALUE  (0)
+
+#define KENKENLIB_EQUATION_SOLVED (1)
+#define KENKENLIB_EQUATION_NOT_SOLVED (0)
+
 enum MathOperation
 {
    Add = 0,
@@ -39,7 +45,16 @@ int GetKenKenWidth(KenKenLib api);
 int GetKenKenHeight(KenKenLib api);
 int IsKenKenGameOver(KenKenLib api);
 
+int GetKenKenSpotValue(KenKenLib api, int x, int y);
+int SetKenKenSpotValue(KenKenLib api, int x, int y, int value);
+
 int KenKenSpotShareSameEquation(KenKenLib api, int x1, int y1, int x2, int y2);
 int GetKenKenEquationValue(KenKenLib api, int x, int y);
+int IsKenKenUniqueValueForRowColumn(KenKenLib api, int x, int y);
+
+int GetNumKenKenEquations(KenKenLib api);
+int IsKenKenEquationSolved(KenKenLib api, int nIndex);
+
+enum MathOperation GetKenKenEquationType(KenKenLib api, int x, int y);
 
 #endif

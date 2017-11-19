@@ -10,5 +10,7 @@ void IntToA(char* pstrBuffer, int bufferSize, int n);
 
 void StringCopy(char* pstrOutput, int bufferSize, char* pstrInput);
 
+void StringAppend(char* pstrBuffer, int nSize, char* pstrAddition);
+
 #endif
 
