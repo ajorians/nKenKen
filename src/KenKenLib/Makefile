@@ -5,7 +5,7 @@ GCCFLAGS = -O3 -Os -std=c99 -marm -nostdlib -I"../include"
 LD = nspire-ld
 LDFLAGS = s -nostdlib
 OBJCOPY := "$(shell (which arm-elf-objcopy arm-none-eabi-objcopy arm-linux-gnueabi-objcopy | head -1) 2>/dev/null)"
-LIB = libCross.a
+LIB = libKenKen.a
 DISTDIR = ../lib
 vpath %.a $(DISTDIR)
 OBJS = $(patsubst %.c,%.o,$(wildcard *.c))

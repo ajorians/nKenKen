@@ -12,6 +12,9 @@ typedef void* KenKenLib;
 #define KENKENLIB_GAMEOVER		(1)
 #define KENKENLIB_NOT_GAMEOVER		(0)
 
+#define KENKENLIB_SHARE_EQUATION (1)
+#define KENKENLIB_NOT_SHARE_EQUATION (0)
+
 enum MathOperation
 {
    Add = 0,
@@ -35,5 +38,8 @@ void ClearKenKenLibError(KenKenLib api);
 int GetKenKenWidth(KenKenLib api);
 int GetKenKenHeight(KenKenLib api);
 int IsKenKenGameOver(KenKenLib api);
+
+int KenKenSpotShareSameEquation(KenKenLib api, int x1, int y1, int x2, int y2);
+int GetKenKenEquationValue(KenKenLib api, int x, int y);
 
 #endif

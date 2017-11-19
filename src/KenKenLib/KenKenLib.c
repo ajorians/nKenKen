@@ -185,6 +185,7 @@ int KenKenLibCreate(KenKenLib* api, const char* pstrFile)
                         struct KenKenEquation* pEquation = pK->m_pEquations + nEquation;
                         pEquation->m_nValue = nEquationValue;
                         pEquation->m_eOperation = (enum MathOperation)nValue;
+                        break;
                      }
                   }
                }
@@ -237,26 +238,30 @@ int KenKenLibCreate(KenKenLib* api, const char* pstrFile)
                         buffer[nSpotInBuffer++] = ch;
                      }
                      else {
-                        if (ch != ' ' && ch != '\n' && ch != '\r') {
+                        if (ch != ' ' && ch != '\n' && ch != '\r' ) {
                            pstr--;
                            break;
                         }
                         if( nSpotInBuffer == 0 )
                            continue;
-                        buffer[nSpotInBuffer] = '\0';
-                        nSpotInBuffer = 0;
-                        nValue = atoi(buffer);
 
-                        //printf("Value for cell: %d\n", nValue);
-
-                        struct KenKenEquation* pEquation = GetEquation(pK->m_pEquations, nValue);
-                        if (pEquation == NULL)
-                        {
-                           printf("Equation is null; shouldn't happen\n");
-                        }
-                        pCell->m_pEquation = pEquation;
+                        break;
                      }
                   }
+
+                  buffer[nSpotInBuffer] = '\0';
+                  nSpotInBuffer = 0;
+                  nValue = atoi(buffer);
+
+                  //printf("Value for cell: %d\n", nValue);
+
+                  struct KenKenEquation* pEquation = GetEquation(pK->m_pEquations, nValue);
+                  if (pEquation == NULL)
+                  {
+                     printf("Equation is null; shouldn't happen\n");
+                  }
+                  pCell->m_pEquation = pEquation;
+
               }
            }
          }
@@ -343,6 +348,35 @@ int IsKenKenGameOver(KenKenLib api)
 
    //printf("Game over\n");
    return KENKENLIB_GAMEOVER;
+}
+
+int KenKenSpotShareSameEquation(KenKenLib api, int x1, int y1, int x2, int y2)
+{
+   struct KenKen* pK;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+
+   if (x1 < 0 || x2 < 0 || x1 >= pK->m_pBoard->m_nWidth || x2 >= pK->m_pBoard->m_nWidth ||
+       y1 < 0 || y2 < 0 || y1 >= pK->m_pBoard->m_nHeight || y2 >= pK->m_pBoard->m_nHeight)
+      return KENKENLIB_NOT_SHARE_EQUATION;
+
+   if (GetAt(pK->m_pBoard, x1, y1)->m_pEquation != GetAt(pK->m_pBoard, x2, y2)->m_pEquation)
+      return KENKENLIB_NOT_SHARE_EQUATION;
+
+   return KENKENLIB_SHARE_EQUATION;
+}
+
+int GetKenKenEquationValue(KenKenLib api, int x, int y)
+{
+   struct KenKen* pK;
+   struct KenKenEquation* pEquation;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+
+   pEquation = GetAt(pK->m_pBoard, x, y)->m_pEquation;
+   return pEquation ? pEquation->m_nValue : -1;
 }
 
 
