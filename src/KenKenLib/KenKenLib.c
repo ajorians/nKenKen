@@ -467,72 +467,80 @@ int GetNumKenKenEquations(KenKenLib api)
    return pK->m_nNumEquations;
 }
 
-/* arr[]  ---> Input Array
-n      ---> Size of input array
-r      ---> Size of a combination to be printed
-index  ---> Current index in data[]
-data[] ---> Temporary array to store current combination
-i      ---> index of current element in arr[]     */
-int combinationSubtraction(int arr[], int n, int r, int index, int data[], int i, int nEquationValue)
+int CheckSubtractionRecursive(int arr[], int count, int data[], int nSpot, int nDesiredResult)
 {
-   // Current cobination is ready, print it
-   if (index == r)
+   int arrNumbers[10 * 10];
+   memcpy(arrNumbers, arr, 10 * 10);
+   int n;
+   for (n = 0; n < count; n++)
    {
-      int nResult = data[0];
-      for (int j = 1; j < r; j++)
-         nResult -= data[j];
-      
-      return nResult == nEquationValue;
+      if (arrNumbers[n] <= 0)
+         continue;
+
+      data[nSpot] = arrNumbers[n];
+      arrNumbers[n] = 0;
+
+      if (nSpot+1 == count)
+      {
+         int spot;
+
+         int value = data[0];
+         for (spot = 1; spot < count; spot++)
+            value -= data[spot];
+
+         if (value == nDesiredResult)
+            return 1;
+      }
+      else
+      {
+         if (CheckSubtractionRecursive(arrNumbers, count, data, nSpot + 1, nDesiredResult) == 1)
+            return 1;
+
+         arrNumbers[n] = data[nSpot];
+      }
    }
 
-   // When no more elements are there to put in data[]
-   if (i >= n)
-      return 0;
-
-   // current is included, put next at next location
-   data[index] = arr[i];
-   if (1 == combinationSubtraction(arr, n, r, index + 1, data, i + 1, nEquationValue))
-      return 1;
-
-   // current is excluded, replace it with next (Note that
-   // i+1 is passed, but index is not changed)
-   return combinationSubtraction(arr, n, r, index, data, i + 1, nEquationValue);
+   return 0;
 }
 
-/* arr[]  ---> Input Array
-n      ---> Size of input array
-r      ---> Size of a combination to be printed
-index  ---> Current index in data[]
-data[] ---> Temporary array to store current combination
-i      ---> index of current element in arr[]     */
-int combinationDivision(int arr[], int n, int r, int index, int data[], int i, int nEquationValue)
+int CheckDivisionRecursive(int arr[], int count, int data[], int nSpot, int nDesiredResult)
 {
-   // Current cobination is ready, print it
-   if (index == r)
+   int arrNumbers[10 * 10];
+   memcpy(arrNumbers, arr, 10 * 10);
+   int n;
+   for (n = 0; n < count; n++)
    {
-      int nResult = data[0];
-      for (int j = 1; j < r; j++)
-      {
-         if (data[j] == 0)
-            return 0;
-         nResult /= data[j];
-      }
+      if (arrNumbers[n] <= 0)
+         continue;
 
-      return nResult == nEquationValue;
+      data[nSpot] = arrNumbers[n];
+      arrNumbers[n] = 0;
+
+      if (nSpot + 1 == count)
+      {
+         int spot;
+
+         int value = data[0];
+         for (spot = 1; spot < count; spot++)
+         {
+            if (data[spot] == 0)
+               return 0;
+            value /= data[spot];
+         }
+
+         if (value == nDesiredResult)
+            return 1;
+      }
+      else
+      {
+         if (CheckDivisionRecursive(arrNumbers, count, data, nSpot + 1, nDesiredResult) == 1)
+            return 1;
+
+         arrNumbers[n] = data[nSpot];
+      }
    }
 
-   // When no more elements are there to put in data[]
-   if (i >= n)
-      return 0;
-
-   // current is included, put next at next location
-   data[index] = arr[i];
-   if (1 == combinationDivision(arr, n, r, index + 1, data, i + 1, nEquationValue))
-      return 1;
-
-   // current is excluded, replace it with next (Note that
-   // i+1 is passed, but index is not changed)
-   return combinationDivision(arr, n, r, index, data, i + 1, nEquationValue);
+   return 0;
 }
 
 int IsKenKenEquationSolved(KenKenLib api, int nIndex)
@@ -572,10 +580,10 @@ int IsKenKenEquationSolved(KenKenLib api, int nIndex)
       if( nSum != pEquation->m_nValue )
          return KENKENLIB_EQUATION_NOT_SOLVED;
    }
-   if (pEquation->m_eOperation == Subtract)
+   else if (pEquation->m_eOperation == Subtract)
    {
       int data[10 * 10];
-      if (combinationSubtraction(arrSpotValues, nCount, nCount, 0, data, 0, pEquation->m_nValue ) == 0 )
+      if( CheckSubtractionRecursive(arrSpotValues, nCount, data, 0, pEquation->m_nValue) == 0)
          return KENKENLIB_EQUATION_NOT_SOLVED;
    }
    else if (pEquation->m_eOperation == Multiply)
@@ -587,10 +595,10 @@ int IsKenKenEquationSolved(KenKenLib api, int nIndex)
       if (nProduct != pEquation->m_nValue)
          return KENKENLIB_EQUATION_NOT_SOLVED;
    }
-   if (pEquation->m_eOperation == Divide)
+   else if (pEquation->m_eOperation == Divide)
    {
       int data[10 * 10];
-      if (combinationDivision(arrSpotValues, nCount, nCount, 0, data, 0, pEquation->m_nValue) == 0)
+      if (CheckDivisionRecursive(arrSpotValues, nCount, data, 0, pEquation->m_nValue) == 0)
          return KENKENLIB_EQUATION_NOT_SOLVED;
    }
 
