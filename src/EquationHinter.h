@@ -31,6 +31,7 @@ struct EquationHinter
    enum MathOperation m_eOperation;
 
    int m_nNumSpots;
+   int m_nDuplicatesAllowed;
 
    int m_arrPossibilities[NUM_POSSIBILITIES][VALUES_PER_POSSIBILITY];
    int m_nPurmutations;
@@ -40,7 +41,7 @@ struct EquationHinter
 
 void CreateHinter(struct EquationHinter** ppHinter, struct SDL_Surface* pScreen, struct Config* pConfig, KenKenLib kenken);
 void FreeHinter(struct EquationHinter** ppHinter);
-void StartEquationHinting(struct EquationHinter* pHinter, int x, int y);
+void StartEquationHinting(struct EquationHinter* pHinter, int x, int y, int nForced);
 void ProcessHinter(struct EquationHinter* pHinter);
 void DrawHinter(struct EquationHinter* pHinter);
 

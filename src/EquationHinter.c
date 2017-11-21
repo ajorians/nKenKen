@@ -38,9 +38,9 @@ void FreeHinter(struct EquationHinter** ppHinter)
    free(pHinter);
 }
 
-void StartEquationHinting(struct EquationHinter* pHinter, int x, int y)
+void StartEquationHinting(struct EquationHinter* pHinter, int x, int y, int nForced)
 {
-   if (KenKenSpotShareSameEquation(pHinter->m_KenKen, pHinter->m_nX, pHinter->m_nY, x, y) == KENKENLIB_SHARE_EQUATION)
+   if (nForced == 0 && KenKenSpotShareSameEquation(pHinter->m_KenKen, pHinter->m_nX, pHinter->m_nY, x, y) == KENKENLIB_SHARE_EQUATION)
    {
       pHinter->m_nX = x;
       pHinter->m_nY = y;
@@ -50,6 +50,59 @@ void StartEquationHinting(struct EquationHinter* pHinter, int x, int y)
    pHinter->m_nX = x;
    pHinter->m_nY = y;
    pHinter->m_eStatus = FreshEquation;
+}
+
+int DoesPurmutationHasValuesWithSpotValues(struct EquationHinter* pHinter, int arrValues[])
+{
+   int x, y;
+   for (x = 0; x < GetKenKenWidth(pHinter->m_KenKen); x++)
+   {
+      for (y = 0; y < GetKenKenHeight(pHinter->m_KenKen); y++)
+      {
+         int nSpotValue = GetKenKenSpotValue(pHinter->m_KenKen, x, y);
+         if (nSpotValue > 0)
+         {
+            if (KenKenSpotShareSameEquation(pHinter->m_KenKen, x, y, pHinter->m_nX, pHinter->m_nY) == KENKENLIB_SHARE_EQUATION)
+            {
+               int n;
+               int nHasValue = 0;
+               for (n = 0; n < VALUES_PER_POSSIBILITY; n++)
+               {
+                  if (arrValues[n] == nSpotValue)
+                  {
+                     nHasValue = 1;
+                     break;
+                  }
+               }
+
+               if (nHasValue == 0)
+                  return 0;
+            }
+         }
+      }
+   }
+   return 1;
+}
+
+int HasDuplicates(int arrValues[])
+{
+   int n1, n2;
+   for (n1 = 0; n1 < VALUES_PER_POSSIBILITY; n1++)
+   {
+      int nValueCompare = arrValues[n1];
+      if (nValueCompare <= 0)
+         break;
+      for (n2 = n1+1; n2 < VALUES_PER_POSSIBILITY; n2++)
+      {
+         int nValue = arrValues[n2];
+         if (nValue <= 0)
+            break;
+
+         if (nValueCompare == nValue)
+            return 1;
+      }
+   }
+   return 0;
 }
 
 void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperation, int* pnSolutionIndex, int nNumber, int nTotalNumbers, int nTotalThusFar, int nDesired, int arrValues[])
@@ -63,6 +116,13 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
    if (nNumber >= nTotalNumbers)
    {
       if (nTotalThusFar == nDesired) {
+         //Check if possibility uses numbers already in spots
+         if (DoesPurmutationHasValuesWithSpotValues(pHinter, arrValues) == 0)
+            return;
+
+         if (pHinter->m_nDuplicatesAllowed == 0 && HasDuplicates(arrValues) == 1)
+            return;
+
          //Add to possible solutions
          if (*pnSolutionIndex < NUM_POSSIBILITIES)
          {
@@ -112,12 +172,10 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
          continue;
       if (amount < 0)
          continue;
-#if 1
       if (eOperation == Add && (amount + (nTotalNumbers - (nNumber + 1))) > nDesired)
          continue;
       if (eOperation == Subtract && (amount - (nTotalNumbers - (nNumber + 1))) < nDesired)
          continue;
-#endif
 
       arrValues[nNumber] = n;
 
@@ -144,16 +202,38 @@ void ProcessHinter(struct EquationHinter* pHinter)
    else if (pHinter->m_eStatus == DeterminedOperationAndResult)
    {
       int x, y;
+      int nMultiRow = 0, nMultiCol = 0;
+      int nFirstX = -1, nFirstY = -1;
       int numSpots = 0;
       for (x = 0; x < GetKenKenWidth(pHinter->m_KenKen); x++)
       {
          for (y = 0; y < GetKenKenHeight(pHinter->m_KenKen); y++)
          {
             if (KenKenSpotShareSameEquation(pHinter->m_KenKen, x, y, pHinter->m_nX, pHinter->m_nY) == KENKENLIB_SHARE_EQUATION)
+            {
                numSpots++;
+
+               if (nFirstX != -1 && x != nFirstX) {
+                  nMultiCol = 1;
+               }
+               if (nFirstY != -1 && y != nFirstY) {
+                  nMultiRow = 1;
+               }
+
+               if (nFirstX == -1)
+               {
+                  nFirstX = x;
+               }
+               if (nFirstY == -1)
+               {
+                  nFirstY = y;
+               }
+            }
          }
       }
       pHinter->m_nNumSpots = numSpots;
+      pHinter->m_nDuplicatesAllowed = (nMultiRow && nMultiCol) ? 1 : 0;
+
       pHinter->m_eStatus = DeterminedNumberOfSpots;
       return;
    }

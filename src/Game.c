@@ -41,7 +41,7 @@ void CreateGame(struct Game** ppGame, const char* pstrLevelData, int nLevelNum, 
 
    pGame->m_pEquationHinter = NULL;
    CreateHinter(&pGame->m_pEquationHinter, pGame->m_pScreen, pGame->m_pConfig, pGame->m_KenKen);
-   StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
+   StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 1);
 
    pGame->m_bShouldQuit = 0;
 }
@@ -132,28 +132,28 @@ int GamePollEvents(struct Game* pGame)
                case SDLK_UP:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Up);
-                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 0);
 		  }
                   break;
 
 	       case SDLK_DOWN:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Down);
-                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 0);
 		  }
                   break;
 
                case SDLK_LEFT:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Left);
-                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 0);
 		  }
                   break;
 
                case SDLK_RIGHT:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Right);
-                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 0);
 		  }
                   break;
 
@@ -180,22 +180,10 @@ int GamePollEvents(struct Game* pGame)
                case SDLK_9:
                   if (pGame->m_bWon != 1) {
                      SetKenKenSpotValue(pGame->m_KenKen, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), event.key.keysym.sym - SDLK_0);
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 1);
                      pGame->m_bWon = IsKenKenGameOver(pGame->m_KenKen);
                      UpdateGameWon(pGame);
                   }
-                  break;
-
-               case SDLK_LSHIFT:
-               case SDLK_RSHIFT:
-		  if( pGame->m_bWon != 1 ) {
-                     //ToggleCrossCellMarking(pGame->m_Cross, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
-		  }
-                  break;
-
-               case SDLK_a:
-		  if( pGame->m_bWon != 1 ) {
-                     //CrossDoSolveStep(pGame->m_Cross);
-		  }
                   break;
 
                default:
