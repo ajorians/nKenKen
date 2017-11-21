@@ -105,6 +105,14 @@ int HasDuplicates(int arrValues[])
    return 0;
 }
 
+int IsDisallowedValue(struct EquationHinter* pHinter, int n)
+{
+   //n should never be 0
+   if (pHinter->m_arrValuesNotAllowed[n - 1] == n)
+      return 1;
+   return 0;
+}
+
 void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperation, int* pnSolutionIndex, int nNumber, int nTotalNumbers, int nTotalThusFar, int nDesired, int arrValues[])
 {
    int amount;
@@ -123,6 +131,9 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
          if (pHinter->m_nDuplicatesAllowed == 0 && HasDuplicates(arrValues) == 1)
             return;
 
+         //TODO: For operations where order doesn't matter (i.e add/multiplication)
+         //Check for duplicate of earlier permutation
+
          //Add to possible solutions
          if (*pnSolutionIndex < NUM_POSSIBILITIES)
          {
@@ -136,6 +147,9 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
 
    for (n = min(GetKenKenWidth(pHinter->m_KenKen), 9); n > 0; n--)
    {
+      if (IsDisallowedValue(pHinter, n) == 1)
+         continue;
+
       if (nNumber == 0)
       {
          amount = n;
@@ -193,6 +207,7 @@ void ProcessHinter(struct EquationHinter* pHinter)
    {
       //For this equation figure; get operation and result
       pHinter->m_DisplayBuffer[0] = '\0';
+      memset(pHinter->m_arrValuesNotAllowed, 0, sizeof(pHinter->m_arrValuesNotAllowed));
       pHinter->m_eOperation = GetKenKenEquationType(pHinter->m_KenKen, pHinter->m_nX, pHinter->m_nY);
       pHinter->m_nEquationResult = GetKenKenEquationValue(pHinter->m_KenKen, pHinter->m_nX, pHinter->m_nY);
       pHinter->m_eStatus = DeterminedOperationAndResult;
@@ -233,12 +248,43 @@ void ProcessHinter(struct EquationHinter* pHinter)
       }
       pHinter->m_nNumSpots = numSpots;
       pHinter->m_nDuplicatesAllowed = (nMultiRow && nMultiCol) ? 1 : 0;
+      pHinter->m_nHorizontal = nMultiRow ? 0 : 1;
 
       pHinter->m_eStatus = DeterminedNumberOfSpots;
       return;
    }
 
    else if (pHinter->m_eStatus == DeterminedNumberOfSpots)
+   {
+      if (pHinter->m_nDuplicatesAllowed == 0)
+      {
+         int n;
+         if (pHinter->m_nHorizontal == 1) {
+            for (n = 0; n < GetKenKenWidth(pHinter->m_KenKen); n++) {
+               int nValue = GetKenKenSpotValue(pHinter->m_KenKen, n, pHinter->m_nY);
+               if (KenKenSpotShareSameEquation(pHinter->m_KenKen, n, pHinter->m_nY, pHinter->m_nX, pHinter->m_nY) == KENKENLIB_NOT_SHARE_EQUATION &&
+                  nValue > 0)
+               {
+                  pHinter->m_arrValuesNotAllowed[nValue-1] = nValue;
+               }
+            }
+         }
+         else {
+            for (n = 0; n < GetKenKenHeight(pHinter->m_KenKen); n++) {
+               int nValue = GetKenKenSpotValue(pHinter->m_KenKen, pHinter->m_nX, n);
+               if (KenKenSpotShareSameEquation(pHinter->m_KenKen, pHinter->m_nX, n, pHinter->m_nX, pHinter->m_nY) == KENKENLIB_NOT_SHARE_EQUATION &&
+                  nValue > 0)
+               {
+                  pHinter->m_arrValuesNotAllowed[nValue - 1] = nValue;
+               }
+            }
+         }
+      }
+      pHinter->m_eStatus = DeterminedUnallowedValues;
+      return;
+   }
+
+   else if (pHinter->m_eStatus == DeterminedUnallowedValues)
    {
       int arrValues[VALUES_PER_POSSIBILITY] = { 0 };
       pHinter->m_nPurmutations = 0;

@@ -11,6 +11,7 @@ enum HintingStatus
    FreshEquation,
    DeterminedOperationAndResult,
    DeterminedNumberOfSpots,
+   DeterminedUnallowedValues,
    DeterminedPurmutations,
    FinishedEquation
 };
@@ -32,6 +33,9 @@ struct EquationHinter
 
    int m_nNumSpots;
    int m_nDuplicatesAllowed;
+   int m_nHorizontal;
+
+   int m_arrValuesNotAllowed[9];
 
    int m_arrPossibilities[NUM_POSSIBILITIES][VALUES_PER_POSSIBILITY];
    int m_nPurmutations;
