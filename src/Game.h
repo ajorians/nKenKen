@@ -8,6 +8,7 @@
 #include "Metrics.h"
 #include "Piece.h"
 #include "Selector.h"
+#include "EquationHinter.h"
 
 struct Game
 {
@@ -18,6 +19,7 @@ struct Game
    struct Metrics* m_pMetrics;
    struct Piece* m_apPieces;
    struct Selector* m_pSelector;
+   struct EquationHinter* m_pEquationHinter;
    int m_bShouldQuit;
    struct SDL_Surface* m_pYouWinGraphic;
    struct SDL_Surface* m_pScreen;//Does not own

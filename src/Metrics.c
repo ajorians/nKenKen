@@ -20,7 +20,7 @@ void CreateMetrics(struct Metrics** ppMetrics, KenKenLib KenKen)
    int nHeight = GetKenKenHeight(KenKen);
 
    int nMaxPieceWidth = (SCREEN_WIDTH - (MARGIN_LEFT*2)) / nWidth;
-   int nMaxPieceHeight = (SCREEN_HEIGHT - (MARGIN_TOP*2)) / nHeight;
+   int nMaxPieceHeight = (SCREEN_HEIGHT - (MARGIN_TOP*2) - 15) / nHeight;
 
    pMetrics->m_nPieceWidth = nMaxPieceWidth;
    pMetrics->m_nPieceHeight = nMaxPieceHeight;

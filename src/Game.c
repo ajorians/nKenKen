@@ -39,6 +39,10 @@ void CreateGame(struct Game** ppGame, const char* pstrLevelData, int nLevelNum, 
    pGame->m_pSelector = NULL;
    CreateSelector(&pGame->m_pSelector, pGame->m_pScreen, pGame->m_pConfig, pGame->m_pMetrics, pGame->m_KenKen);
 
+   pGame->m_pEquationHinter = NULL;
+   CreateHinter(&pGame->m_pEquationHinter, pGame->m_pScreen, pGame->m_pConfig, pGame->m_KenKen);
+   StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
+
    pGame->m_bShouldQuit = 0;
 }
 
@@ -60,6 +64,7 @@ void FreeGame(struct Game** ppGame)
    SDL_FreeSurface(pGame->m_pYouWinGraphic);
 #endif
    FreeSelector(&pGame->m_pSelector);
+   FreeHinter(&pGame->m_pEquationHinter);
    FreeBackground(&pGame->m_pBackground);
    FreeMetrics(&pGame->m_pMetrics);
 
@@ -87,7 +92,10 @@ void DrawBoard(struct Game* pGame)
 
    //Draw selector
    DrawSelector(pGame->m_pSelector);
-   
+
+   //Draw hinter
+   DrawHinter(pGame->m_pEquationHinter);
+
    if( pGame->m_bWon == 1 ) {
       SDL_Rect rectYouWin;
       rectYouWin.x = (SCREEN_WIDTH - pGame->m_pYouWinGraphic->w)/2;
@@ -124,24 +132,28 @@ int GamePollEvents(struct Game* pGame)
                case SDLK_UP:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Up);
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
 		  }
                   break;
 
 	       case SDLK_DOWN:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Down);
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
 		  }
                   break;
 
                case SDLK_LEFT:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Left);
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
 		  }
                   break;
 
                case SDLK_RIGHT:
 		  if( pGame->m_bWon != 1 ) {
                      Move(pGame->m_pSelector, Right);
+                     StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
 		  }
                   break;
 
@@ -202,6 +214,8 @@ int GameLoop(struct Game* pGame)
       return 0;
 
    DrawBoard(pGame);
+
+   ProcessHinter(pGame->m_pEquationHinter);
 
    SDL_Delay(30);
 

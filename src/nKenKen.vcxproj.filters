@@ -63,6 +63,9 @@
     <ClCompile Include="StarDrawer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EquationHinter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Background.h">
@@ -117,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="YouWinGraphic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EquationHinter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

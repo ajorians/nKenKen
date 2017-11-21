@@ -1,4 +1,5 @@
 #include "Font.h"
+#include "Replacements.h"
 
 Font* LoadFont(char* pstrName, int nID, int r, int g, int b, int size)
 {
@@ -27,7 +28,7 @@ void DrawText(SDL_Surface* pSurface, Font* pFont, int x, int y, char* pstrBuffer
    SDL_Color textColor = { r, g, b };
    message = TTF_RenderText_Solid(pFont, pstrBuffer, textColor);
    SDL_Rect rectSrc, rectDst;
-   rectSrc.w = 150;
+   rectSrc.w = SCREEN_WIDTH- x;
    rectSrc.h = 24;
    rectSrc.x = 0;
    rectSrc.y = 0;

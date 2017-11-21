@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="Background.c" />
     <ClCompile Include="Config.c" />
+    <ClCompile Include="EquationHinter.c" />
     <ClCompile Include="Font.c" />
     <ClCompile Include="Game.c" />
     <ClCompile Include="Help.c" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="Background.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="EquationHinter.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameBackgroundWide.h" />
