@@ -113,9 +113,9 @@ int IsDisallowedValue(struct EquationHinter* pHinter, int n)
    return 0;
 }
 
-void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperation, int* pnSolutionIndex, int nNumber, int nTotalNumbers, int nTotalThusFar, int nDesired, int arrValues[])
+void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperation, int* pnSolutionIndex, int nNumber, int nTotalNumbers, double dTotalThusFar, int nDesired, int arrValues[])
 {
-   int amount;
+   double amount;
    int n;
 
    if (*pnSolutionIndex >= NUM_POSSIBILITIES)
@@ -123,7 +123,7 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
 
    if (nNumber >= nTotalNumbers)
    {
-      if (nTotalThusFar == nDesired) {
+      if (dTotalThusFar == nDesired) {
          //Check if possibility uses numbers already in spots
          if (DoesPurmutationHasValuesWithSpotValues(pHinter, arrValues) == 0)
             return;
@@ -131,8 +131,19 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
          if (pHinter->m_nDuplicatesAllowed == 0 && HasDuplicates(arrValues) == 1)
             return;
 
-         //TODO: For operations where order doesn't matter (i.e add/multiplication)
          //Check for duplicate of earlier permutation
+         if (pHinter->m_eOperation == Add || pHinter->m_eOperation == Multiply )
+         {
+            //If has bigger numbers after smaller numbers then it is a duplicate and then remove it
+            int n;
+            for (n = 1; n < VALUES_PER_POSSIBILITY; n++)
+            {
+               if (arrValues[n] == 0)
+                  break;
+               if (arrValues[n] > arrValues[n - 1])
+                  return;
+            }
+         }
 
          //Add to possible solutions
          if (*pnSolutionIndex < NUM_POSSIBILITIES)
@@ -156,7 +167,7 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
       }
       else
       {
-         amount = nTotalThusFar;
+         amount = dTotalThusFar;
          if (eOperation == Add)
          {
             amount += n;

@@ -18,6 +18,8 @@ void CreateGame(struct Game** ppGame, const char* pstrLevelData, int nLevelNum, 
 #ifdef _TINSPIRE
    pGame->m_pYouWinGraphic = nSDL_LoadImage(image_YouWin);
    SDL_SetColorKey(pGame->m_pYouWinGraphic, SDL_SRCCOLORKEY, SDL_MapRGB(pGame->m_pYouWinGraphic->format, 255, 255, 255));
+#else
+   pGame->m_pYouWinGraphic = NULL;
 #endif
 
    pGame->m_pScreen = pScreen;
@@ -60,9 +62,9 @@ void FreeGame(struct Game** ppGame)
    }
    free(pGame->m_apPieces);
 
-#ifdef _TINSPIRE
-   SDL_FreeSurface(pGame->m_pYouWinGraphic);
-#endif
+   if(pGame->m_pYouWinGraphic != NULL )
+      SDL_FreeSurface(pGame->m_pYouWinGraphic);
+
    FreeSelector(&pGame->m_pSelector);
    FreeHinter(&pGame->m_pEquationHinter);
    FreeBackground(&pGame->m_pBackground);
@@ -78,7 +80,7 @@ void FreeGame(struct Game** ppGame)
 void DrawBoard(struct Game* pGame)
 {
    DrawBackground(pGame->m_pBackground);
-#if 1
+
    int nWidth = GetKenKenWidth(pGame->m_KenKen);
    int nHeight = GetKenKenHeight(pGame->m_KenKen);
 
@@ -96,7 +98,7 @@ void DrawBoard(struct Game* pGame)
    //Draw hinter
    DrawHinter(pGame->m_pEquationHinter);
 
-   if( pGame->m_bWon == 1 ) {
+   if( pGame->m_bWon == 1 && pGame->m_pYouWinGraphic != NULL ) {
       SDL_Rect rectYouWin;
       rectYouWin.x = (SCREEN_WIDTH - pGame->m_pYouWinGraphic->w)/2;
       rectYouWin.y = (SCREEN_HEIGHT - pGame->m_pYouWinGraphic->h)/2;
@@ -104,7 +106,6 @@ void DrawBoard(struct Game* pGame)
       rectYouWin.h = pGame->m_pYouWinGraphic->h;
       SDL_BlitSurface(pGame->m_pYouWinGraphic, NULL, pGame->m_pScreen, &rectYouWin);
    }
-#endif
    
    SDL_UpdateRect(pGame->m_pScreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }

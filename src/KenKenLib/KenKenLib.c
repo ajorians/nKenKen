@@ -588,7 +588,7 @@ int IsKenKenEquationSolved(KenKenLib api, int nIndex)
    }
    else if (pEquation->m_eOperation == Multiply)
    {
-      int nProduct = 0;
+      int nProduct = 1;
       for (x = 0; x < nCount; x++)
          nProduct *= arrSpotValues[x];
 
