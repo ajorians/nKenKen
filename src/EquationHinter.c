@@ -156,7 +156,10 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
       return;
    }
 
-   for (n = min(GetKenKenWidth(pHinter->m_KenKen), 9); n > 0; n--)
+   int nMinWidth = GetKenKenWidth(pHinter->m_KenKen);
+   if( nMinWidth > 9 )
+      nMinWidth = 9;
+   for (n = nMinWidth; n > 0; n--)
    {
       if (IsDisallowedValue(pHinter, n) == 1)
          continue;

@@ -32,7 +32,7 @@ int g_nRelocatedGlobals = 0;
 
 int TestConstruction()
 {
-   CrossLib api;
+   KenKenLib api;
    PRINT_FUNC;
 /*   if( CROSSLIB_OK != CrossLibCreate(&api, LEVEL_TEST) )
       return TEST_FAILED;

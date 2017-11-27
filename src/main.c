@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
    FreeGame(&pGame);
 
 #ifdef _TINSPIRE
-   FreeConfig(&pConfig);
+   //FreeConfig(&pConfig);
 #endif
 
    printf("Quitting SDL.\n");
