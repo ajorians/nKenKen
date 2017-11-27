@@ -3,12 +3,12 @@ LD = nspire-ld
 GENZEHN = genzehn
 
 GCCFLAGS = -Os -Wall -W -marm -Wno-unused-parameter -I include
-LDFLAGS = -L lib -lndls -lCross -lArchive
+LDFLAGS = -L lib -lndls -lKenKen -lArchive
 OBJCOPY := "$(shell which arm-elf-objcopy 2>/dev/null)"
 ifeq (${OBJCOPY},"")
 	OBJCOPY := arm-none-eabi-objcopy
 endif
-EXE = nCrossSet-sdl
+EXE = nKenKen-sdl
 DISTDIR = ..
 
 OBJS = $(patsubst %.c,%.o,$(wildcard *.c))
@@ -18,7 +18,7 @@ vpath %.elf $(DISTDIR)
 all:	prepare $(EXE).prg.tns
 
 prepare:        
-	cd CrossLib; make; cd ..
+	cd KenKenLib; make; cd ..
 	cd ArchiveLib; make; cd ..
 	cd Tests; make; cd ..
 
@@ -36,7 +36,7 @@ $(EXE).prg.tns: $(EXE).tns
 	make-prg $(DISTDIR)/$^ $(DISTDIR)/$@
 
 clean:
-	cd CrossLib; make clean
+	cd KenKenLib; make clean
 	cd ArchiveLib; make clean
 	cd Tests; make clean
 	rm -rf lib
