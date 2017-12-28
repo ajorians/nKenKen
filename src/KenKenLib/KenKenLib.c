@@ -618,4 +618,27 @@ enum MathOperation GetKenKenEquationType(KenKenLib api, int x, int y)
    return pEquation->m_eOperation;
 }
 
+enum LevelOperations GetKenKenOperations(KenKenLib api)
+{
+   struct KenKen* pK;
+   int i;
+   enum LevelOperations eRet = 0;
+   DEBUG_FUNC_NAME;
+
+   pK = (struct KenKen*)api;
+   for (i = 0; i < pK->m_nNumEquations; i++) {
+      enum MathOperation e = pK->m_pEquations[i].m_eOperation;
+      if( e == Add )
+         eRet |= AddOperation;
+      if (e == Subtract)
+         eRet |= SubtractOperation;
+      if (e == Multiply)
+         eRet |= MultiplyOperation;
+      if (e == Divide)
+         eRet |= DivideOperation;
+   }
+
+   return eRet;
+}
+
 

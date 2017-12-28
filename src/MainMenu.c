@@ -135,6 +135,10 @@ void UpdateDimensionAndOperations(struct MainMenu* pMenu, int nLevelNum)
    LevelLoad(strLevelData, nLevelNum);
    KenKenLib kenken;
    KenKenLibCreate(&kenken, strLevelData);
+
+   pMenu->m_nDimension = GetKenKenWidth(kenken);
+   pMenu->m_eOperations = GetKenKenOperations(kenken);
+
    KenKenLibFree(&kenken);
 }
 
@@ -176,6 +180,24 @@ void UpdateDisplay(struct MainMenu* pMenu)
 
    DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2 - 7, buffer, 0, 0, 0);
 
+   IntToA(levelNumBuffer, 4, pMenu->m_nDimension);
+   StringCopy(buffer, 16, "");
+   StringAppend(buffer, 16, levelNumBuffer);
+   StringAppend(buffer, 16, " x ");
+   StringAppend(buffer, 16, levelNumBuffer);
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT / 2 + 5, buffer, 0, 0, 0);
+
+   StringCopy(buffer, 16, "");
+   if( (pMenu->m_eOperations & AddOperation) == AddOperation)
+      StringAppend(buffer, 16, "+");
+   if ((pMenu->m_eOperations & SubtractOperation) == SubtractOperation)
+      StringAppend(buffer, 16, "-");
+   if ((pMenu->m_eOperations & MultiplyOperation) == MultiplyOperation)
+      StringAppend(buffer, 16, "x");
+   if ((pMenu->m_eOperations & DivideOperation) == DivideOperation)
+      StringAppend(buffer, 16, "/");
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT / 2 + 20, buffer, 0, 0, 0);
+
    DrawText(pMenu->m_pScreen, pMenu->m_pFont, 0, SCREEN_HEIGHT - 17, "Options", 0, 0, 0);
    DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH - 50, SCREEN_HEIGHT - 17, "Help", 0, 0, 0);
 
@@ -183,8 +205,8 @@ void UpdateDisplay(struct MainMenu* pMenu)
 
    int left = SCREEN_WIDTH / 2 - 16;
    int top = SCREEN_HEIGHT / 2 - 15;
-   int right = left + 40;
-   int bottom = top + 40;
+   int right = left + 60;
+   int bottom = top + 60;
 
    if( GetBeatLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel) == 1 )
       DrawStar(pMenu->m_pStarDrawer, pMenu->m_pScreen, left - 20, top);

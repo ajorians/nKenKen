@@ -17,6 +17,7 @@ void CreateHinter(struct EquationHinter** ppHinter, struct SDL_Surface* pScreen,
    pHinter->m_pConfig = pConfig;
    pHinter->m_nX = pHinter->m_nY = -1;
    pHinter->m_eStatus = FreshEquation;
+   StringCopy(pHinter->m_DisplayBuffer, sizeof(pHinter->m_DisplayBuffer), "");
 
    if (g_pFontHint == NULL) {
       g_pFontHint = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 0/*R*/, 0/*G*/, 0/*B*/, 12);
@@ -323,7 +324,7 @@ void ProcessHinter(struct EquationHinter* pHinter)
       for (n = 0; n < pHinter->m_nPurmutations; n++)
       {
          int spot;
-         char buffer[10];
+         char buffer[20];
          int nSpotInBuffer = 0;
          if (n != 0)
          {

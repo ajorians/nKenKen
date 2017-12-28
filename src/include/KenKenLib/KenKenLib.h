@@ -29,6 +29,14 @@ enum MathOperation
    Divide
 };
 
+enum LevelOperations
+{
+   AddOperation      = 1 << 0,
+   SubtractOperation = 1 << 1,
+   MultiplyOperation = 1 << 2,
+   DivideOperation   = 1 << 3,
+};
+
 //////////////////////////////////////////////
 //Initalization/Error checking/Mode functions
 //////////////////////////////////////////////
@@ -56,5 +64,6 @@ int GetNumKenKenEquations(KenKenLib api);
 int IsKenKenEquationSolved(KenKenLib api, int nIndex);
 
 enum MathOperation GetKenKenEquationType(KenKenLib api, int x, int y);
+enum LevelOperations GetKenKenOperations(KenKenLib api);
 
 #endif
