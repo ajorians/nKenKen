@@ -4,6 +4,7 @@
 #ifdef _TINSPIRE
 #include <os.h>
 #endif
+#include "Config.h"
 #include <KenKenLib/KenKenLib.h>
 
 struct Metrics
@@ -15,7 +16,7 @@ struct Metrics
    KenKenLib m_KenKen;//Does not own
 };
 
-void CreateMetrics(struct Metrics** ppMetrics, KenKenLib cross);
+void CreateMetrics(struct Metrics** ppMetrics, KenKenLib cross, struct Config* pConfig);
 void FreeMetrics(struct Metrics** ppMetrics);
 int GetPieceLeft(struct Metrics* pMetrics, int x, int y);
 int GetPieceTop(struct Metrics* pMetrics, int x, int y);

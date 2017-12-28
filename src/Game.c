@@ -25,7 +25,7 @@ void CreateGame(struct Game** ppGame, const char* pstrLevelData, int nLevelNum, 
    pGame->m_pScreen = pScreen;
    CreateBackground(&(pGame->m_pBackground), pGame->m_pScreen, pGame->m_pConfig, 1);
    pGame->m_pMetrics = NULL;
-   CreateMetrics(&pGame->m_pMetrics, pGame->m_KenKen);
+   CreateMetrics(&pGame->m_pMetrics, pGame->m_KenKen, pGame->m_pConfig);
 
    int nWidth = GetKenKenWidth(pGame->m_KenKen);
    int nHeight = GetKenKenHeight(pGame->m_KenKen);
@@ -42,7 +42,10 @@ void CreateGame(struct Game** ppGame, const char* pstrLevelData, int nLevelNum, 
    CreateSelector(&pGame->m_pSelector, pGame->m_pScreen, pGame->m_pConfig, pGame->m_pMetrics, pGame->m_KenKen);
 
    pGame->m_pEquationHinter = NULL;
-   CreateHinter(&pGame->m_pEquationHinter, pGame->m_pScreen, pGame->m_pConfig, pGame->m_KenKen);
+   if (GetEquationHint(pGame->m_pConfig) == 1)
+   {
+      CreateHinter(&pGame->m_pEquationHinter, pGame->m_pScreen, pGame->m_pConfig, pGame->m_KenKen);
+   }
    StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 1);
 
    pGame->m_bShouldQuit = 0;

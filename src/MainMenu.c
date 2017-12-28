@@ -7,10 +7,11 @@
 #include "Replacements.h"
 #include "Levels.h"
 #include "MenuGraphic.h"
+#include "SDL/SDL_gfxPrimitives.h"
 
-void UpdateSelectedItems(struct MainMenu* pMenu);
-void FreeLevelMenuItems(struct MainMenu* pMenu);
-void CreateLevelMenuItems(struct MainMenu* pMenu);
+#define MENU_SELECTOR_LINE_WIDTH (2)
+
+void UpdateDimensionAndOperations(struct MainMenu* pMenu, int nLevelNum);
 
 void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pConfig, struct SDL_Surface* pScreen)
 {
@@ -21,17 +22,9 @@ void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pCon
    pMenu->m_pScreen = pScreen;
 
    pMenu->m_eChoice = Play;
-   pMenu->m_eSelection = Levels;
-   pMenu->m_nLevelNum = nLevelNum >= 1 ? nLevelNum : 1;
-   pMenu->m_nCurrentCategory = (pMenu->m_nLevelNum-1) / 8;
-   pMenu->m_nCurrentLevel = (pMenu->m_nLevelNum-1) - (pMenu->m_nCurrentCategory * 8);
+   pMenu->m_nCurrentLevel = nLevelNum >= 1 ? nLevelNum : 1;
 
-   CreateLevelMenuItems(pMenu);
-
-   CreateMenuItem(&pMenu->m_Options, 0, "Options", "", Configuration);
-   CreateMenuItem(&pMenu->m_Help, 1, "Help", "", Configuration);
-
-   UpdateSelectedItems(pMenu);
+   UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
 
    CreateBackground(&(pMenu->m_pBackground), pMenu->m_pScreen, pMenu->m_pConfig, 0);
    pMenu->m_pFont = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
@@ -46,12 +39,7 @@ void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pCon
 void FreeMainMenu(struct MainMenu** ppMenu)
 {
    struct MainMenu* pMenu = *ppMenu;
- 
-   FreeLevelMenuItems(pMenu);
 
-   FreeMenuItem(&pMenu->m_Options);
-   FreeMenuItem(&pMenu->m_Help);
-   
    FreeBackground(&pMenu->m_pBackground);
    FreeFont(pMenu->m_pFont);
 
@@ -80,116 +68,56 @@ int PollEvents(struct MainMenu* pMenu)
             printf( "Key press detected\n" );
             switch( event.key.keysym.sym )
             {
-               case SDLK_ESCAPE:
-                  printf("Hit Escape!n");
-                  pMenu->m_eChoice = Quit;
-                  return 0;
-                  break;
+            case SDLK_ESCAPE:
+               printf("Hit Escape!n");
+               pMenu->m_eChoice = Quit;
+               return 0;
+               break;
 
-               case SDLK_LEFT:
-                  if( pMenu->m_eSelection == Levels ) {
-                     if( pMenu->m_nCurrentLevel > 0 ) {
-                        pMenu->m_nCurrentLevel--;
-                        pMenu->m_nLevelNum--;
-			UpdateSelectedItems(pMenu);
-		     } 
-		  }
-		  else if( pMenu->m_eSelection == Categories ) {
-                     if( pMenu->m_nCurrentCategory > 0 ) {
-                        pMenu->m_nCurrentCategory--;
-                        pMenu->m_nCurrentLevel = 0;
-                        UpdateSelectedItems(pMenu);
-                     }
+            case SDLK_LEFT:
+               if (pMenu->m_eChoice == Play) {
+                  if (pMenu->m_nCurrentLevel > 1) {
+                     pMenu->m_nCurrentLevel--;
+                     UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
                   }
-                  else if( pMenu->m_eSelection == Other && pMenu->m_eChoice == Help ) {
-                      pMenu->m_eChoice = Options;
-                      UpdateSelectedItems(pMenu);
-                  }
-                  break;
+               }
 
-               case SDLK_RIGHT:
-		  if( pMenu->m_eSelection == Levels ) {
-                     if( pMenu->m_nCurrentLevel < 7 ) {
-                        pMenu->m_nCurrentLevel++;
-                        pMenu->m_nLevelNum++;
-			UpdateSelectedItems(pMenu);
-                     }
-		  }
-		  else if( pMenu->m_eSelection == Categories ) {
-                     if( pMenu->m_nCurrentCategory < 6 ) {
-                        pMenu->m_nCurrentCategory++;
-			pMenu->m_nCurrentLevel = 0;
-			UpdateSelectedItems(pMenu);
-		     }
-		  }
-		  else if( pMenu->m_eSelection == Other && pMenu->m_eChoice == Options ) {
-                      pMenu->m_eChoice = Help;
-                      UpdateSelectedItems(pMenu);
+               else if (pMenu->m_eChoice == Help) {
+                  pMenu->m_eChoice = Options;
+               }
+               break;
+
+            case SDLK_RIGHT:
+               if (pMenu->m_eChoice == Play) {
+                  if (pMenu->m_nCurrentLevel < 249) {
+                     pMenu->m_nCurrentLevel++;
+                     UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
                   }
-                  break;
+               }
+
+               else if (pMenu->m_eChoice == Options) {
+                  pMenu->m_eChoice = Help;
+               }
+               break;
 
 	       case SDLK_UP:
-		  if( pMenu->m_eSelection == Levels ) {
-                     if( pMenu->m_nCurrentLevel < 4 ) {
-                        pMenu->m_eSelection = Categories;
-                        UpdateSelectedItems(pMenu);
+		  if( pMenu->m_eChoice == Options || pMenu->m_eChoice == Help) {
+           pMenu->m_eChoice = Play;
 		     }
-		     else {
-                        pMenu->m_nCurrentLevel -= 4;
-			pMenu->m_nLevelNum -= 4;
-			UpdateSelectedItems(pMenu);
-		     }
-		  }
-                  else if( pMenu->m_eSelection == Categories ) {
-		  }
-		  else if( pMenu->m_eSelection == Other )
-                  {
-                      pMenu->m_eSelection = Levels;
-		      pMenu->m_eChoice = Play;
-                      UpdateSelectedItems(pMenu);
-                  }
 		  break;
 
 	       case SDLK_DOWN:
-		  if( pMenu->m_eSelection == Levels ) {
-                     if( pMenu->m_nCurrentLevel < 4 ) {
-                        pMenu->m_nCurrentLevel += 4;
-			pMenu->m_nLevelNum += 4;
-			UpdateSelectedItems(pMenu);
-		     }
-		     else {
-                        pMenu->m_eSelection = Other;
-                        pMenu->m_eChoice = Options;
-                        UpdateSelectedItems(pMenu);
-		     }
-                  }
-		  else if( pMenu->m_eSelection == Categories ) {
-                     pMenu->m_eSelection = Levels;
-		     pMenu->m_nLevelNum = pMenu->m_nCurrentCategory * 8 + 1;
-		     pMenu->m_nCurrentLevel = 0;
-                     FreeLevelMenuItems(pMenu);
-                     CreateLevelMenuItems(pMenu);
-		     UpdateSelectedItems(pMenu);
-                  }
+             if (pMenu->m_eChoice == Play ) {
+                pMenu->m_eChoice = Options;
+             }
 		  break;
 
                case SDLK_SPACE:
                case SDLK_RETURN:
                case SDLK_LCTRL:
-		  if( pMenu->m_eSelection == Levels ) {
+		  if( pMenu->m_eChoice == Play || pMenu->m_eChoice == Options || pMenu->m_eChoice == Help ) {
                      return 0;
 		  }
-		  else if( pMenu->m_eSelection == Categories ) {
-                     pMenu->m_eSelection = Levels;
-		     pMenu->m_nLevelNum = pMenu->m_nCurrentCategory * 8 + 1;
-		     pMenu->m_nCurrentLevel = 0;
-                     FreeLevelMenuItems(pMenu);
-                     CreateLevelMenuItems(pMenu);
-		     UpdateSelectedItems(pMenu);
-		  }
-		  else if( pMenu->m_eSelection == Other ) {
-                      return 0;
-                  }
                   break;
 
                default:
@@ -199,6 +127,15 @@ int PollEvents(struct MainMenu* pMenu)
    }
 
    return 1;
+}
+
+void UpdateDimensionAndOperations(struct MainMenu* pMenu, int nLevelNum)
+{
+   char strLevelData[2048];
+   LevelLoad(strLevelData, nLevelNum);
+   KenKenLib kenken;
+   KenKenLibCreate(&kenken, strLevelData);
+   KenKenLibFree(&kenken);
 }
 
 void UpdateDisplay(struct MainMenu* pMenu)
@@ -230,25 +167,51 @@ void UpdateDisplay(struct MainMenu* pMenu)
    SDL_BlitSurface(pMenu->m_pTitle, &rectSrc, pMenu->m_pScreen, &rectDst);
 #endif
 
-   for(unsigned int i=0; i<sizeof(pMenu->m_Levels)/sizeof(pMenu->m_Levels[0]); i++) {
-      MenuItemDraw(&pMenu->m_Levels[i], pMenu->m_pScreen, NULL);
+   char levelNumBuffer[4];
+   IntToA(levelNumBuffer, 4, pMenu->m_nCurrentLevel);
+
+   char buffer[16];
+   StringCopy(buffer, 16, "Level #");
+   StringAppend(buffer, 16, levelNumBuffer);
+
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2 - 7, buffer, 0, 0, 0);
+
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, 0, SCREEN_HEIGHT - 17, "Options", 0, 0, 0);
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH - 50, SCREEN_HEIGHT - 17, "Help", 0, 0, 0);
+
+   int r = 255, g = 0, b = 0, a = 200;
+
+   int left = SCREEN_WIDTH / 2 - 16;
+   int top = SCREEN_HEIGHT / 2 - 15;
+   int right = left + 40;
+   int bottom = top + 40;
+
+   if( GetBeatLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel) == 1 )
+      DrawStar(pMenu->m_pStarDrawer, pMenu->m_pScreen, left - 20, top);
+
+   if (pMenu->m_eChoice == Options)
+   {
+      left = 0;
+      top = SCREEN_HEIGHT - 20;
+      right = left + 40;
+      bottom = SCREEN_HEIGHT;
+   }
+   else if (pMenu->m_eChoice == Help)
+   {
+      left = SCREEN_WIDTH - 50;
+      top = SCREEN_HEIGHT - 20;
+      right = SCREEN_WIDTH;
+      bottom = SCREEN_HEIGHT;
    }
 
-   if( pMenu->m_eSelection != Categories ) {
-      for(unsigned int i=0; i<sizeof(pMenu->m_ChoiceLevels)/sizeof(pMenu->m_ChoiceLevels[0]); i++) {
-         int nLevel = (pMenu->m_nCurrentCategory*8)+i;
-         int nBeatLevel =
-#ifdef _TINSPIRE
-            GetBeatLevel(pMenu->m_pConfig, nLevel);
-#else
-            0;
-#endif
-         MenuItemDraw(&pMenu->m_ChoiceLevels[i], pMenu->m_pScreen, nBeatLevel == 1 ? pMenu->m_pStarDrawer : NULL );
-      }
-   }
-
-   MenuItemDraw(&pMenu->m_Options, pMenu->m_pScreen, NULL);
-   MenuItemDraw(&pMenu->m_Help, pMenu->m_pScreen, NULL);
+   //Top
+   thickLineRGBA(pMenu->m_pScreen, left, top, right, top, MENU_SELECTOR_LINE_WIDTH, r, g, b, a);
+   //Left
+   thickLineRGBA(pMenu->m_pScreen, left, top, left, bottom, MENU_SELECTOR_LINE_WIDTH, r, g, b, a);
+   //Bottom
+   thickLineRGBA(pMenu->m_pScreen, left, bottom, right, bottom, MENU_SELECTOR_LINE_WIDTH, r, g, b, a);
+   //Right
+   thickLineRGBA(pMenu->m_pScreen, right, top, right, bottom, MENU_SELECTOR_LINE_WIDTH, r, g, b, a);
 
    SDL_UpdateRect(pMenu->m_pScreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
@@ -280,86 +243,6 @@ int MainMenuShowHelp(struct MainMenu* pMenu)
 
 int MainMenuGetLevelNum(struct MainMenu* pMenu)
 {
-   return pMenu->m_nLevelNum;
+   return pMenu->m_nCurrentLevel;
 }
 
-void UpdateSelectedItems(struct MainMenu* pMenu)
-{
-   for(unsigned int i=0; i<sizeof(pMenu->m_Levels)/sizeof(pMenu->m_Levels[0]); i++) {
-      SetMenuItemSelected(&pMenu->m_Levels[i], 0);
-   }
-
-   for(unsigned int i=0; i<sizeof(pMenu->m_ChoiceLevels)/sizeof(pMenu->m_ChoiceLevels[0]); i++) {
-      SetMenuItemSelected(&pMenu->m_ChoiceLevels[i], 0);
-   }
-   
-   SetMenuItemSelected(&pMenu->m_Options, 0);
-   SetMenuItemSelected(&pMenu->m_Help,  0);
-
-   if( pMenu->m_eSelection == Levels || pMenu->m_eSelection == Categories ) {
-      SetMenuItemSelected(&pMenu->m_Levels[pMenu->m_nCurrentCategory], pMenu->m_eSelection == Levels ? 2 : 1);
-      SetMenuItemSelected(&pMenu->m_ChoiceLevels[pMenu->m_nCurrentLevel], 1);
-   }
-   else if( pMenu->m_eSelection == Other ) {
-       SetMenuItemSelected(&pMenu->m_Options, pMenu->m_eChoice == Options ? 1 : 0);
-       SetMenuItemSelected(&pMenu->m_Help, pMenu->m_eChoice == Help ? 1 : 0);
-   }
-}
-
-void FreeLevelMenuItems(struct MainMenu* pMenu)
-{
-    for(unsigned int i=0; i<sizeof(pMenu->m_Levels)/sizeof(pMenu->m_Levels[0]); i++) {
-      FreeMenuItem(&pMenu->m_Levels[i]);
-   }
-   
-   for(unsigned int i=0; i<sizeof(pMenu->m_ChoiceLevels)/sizeof(pMenu->m_ChoiceLevels[0]); i++) {
-      FreeMenuItem(&pMenu->m_ChoiceLevels[i]);
-   }
-}
-
-void CreateLevelMenuItems(struct MainMenu* pMenu)
-{
-   /*static char buffer[8];
-   static char bufferLevel[2048];
-
-   for(unsigned int i=0; i<sizeof(pMenu->m_Levels)/sizeof(pMenu->m_Levels[0]); i++) {
-      buffer[0] = i+1 + '0';
-      buffer[1] = '\0';
-
-      int nLevelsBeaten = 0;
-      for(int j=0; j<(int)(sizeof(pMenu->m_ChoiceLevels)/sizeof(pMenu->m_ChoiceLevels[0])); j++) {
-         int nLevel = (i*8) + j;
-#ifdef _TINSPIRE
-         if( GetBeatLevel( pMenu->m_pConfig, nLevel) == 1 )
-            nLevelsBeaten++;
-#endif
-      }
-   
-      char bufferLevelsBeaten[8];
-      bufferLevelsBeaten[0] = nLevelsBeaten + '0';
-      bufferLevelsBeaten[1] = '/';
-      bufferLevelsBeaten[2] = '8';
-      bufferLevelsBeaten[3] = '\0';
-      CreateMenuItem(&pMenu->m_Levels[i], i, buffer, bufferLevelsBeaten, Category);
-   }
-   
-   for(unsigned int i=0; i<sizeof(pMenu->m_ChoiceLevels)/sizeof(pMenu->m_ChoiceLevels[0]); i++) {
-      buffer[0] = pMenu->m_nCurrentCategory+1 + '0';
-      buffer[1] = '-';
-      buffer[2] = i+1 + '0';
-      buffer[3] = '\0';
-      
-      char bufferDimensions[8];
-
-      LevelLoad(bufferLevel, (pMenu->m_nCurrentCategory*8)+i+1);
-      CrossLib api;
-      CrossLibCreate(&api, bufferLevel);
-      bufferDimensions[0] = GetCrossWidth(api) + '0';
-      bufferDimensions[1]='x';
-      bufferDimensions[2] = GetCrossHeight(api) + '0';
-      bufferDimensions[3] = '\0';
-      CrossLibFree(&api);
-      
-      CreateMenuItem(&pMenu->m_ChoiceLevels[i], i, buffer, bufferDimensions, Level);
-   }*/
-}

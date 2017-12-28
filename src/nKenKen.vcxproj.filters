@@ -54,9 +54,6 @@
     <ClCompile Include="Help.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MenuItem.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Options.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Help.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Options.h">

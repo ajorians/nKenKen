@@ -274,7 +274,7 @@ int KenKenLibCreate(KenKenLib* api, const char* pstrFile)
    return KENKENLIB_OK;
 }
 
-int CrossLibFree(KenKenLib* api)
+int KenKenLibFree(KenKenLib* api)
 {
    struct KenKen* pK;
    DEBUG_FUNC_NAME;

@@ -7,9 +7,9 @@
 #include "SDL/SDL.h"
 #include "Background.h"
 #include "Config.h"
-#include "MenuItem.h"
 #include "Font.h"
 #include "StarDrawer.h"
+#include <KenKenLib\KenKenLib.h>
 
 enum MenuChoice
 {
@@ -19,23 +19,9 @@ enum MenuChoice
    Quit
 };
 
-enum SelectionLocation
-{
-   Categories,
-   Levels,
-   Other
-};
-
 struct MainMenu
 {
    enum MenuChoice m_eChoice;
-   enum SelectionLocation m_eSelection;
-   int m_nLevelNum;
-   struct MenuItem m_Levels[7];
-   struct MenuItem m_ChoiceLevels[8];
-   struct MenuItem m_Options;
-   struct MenuItem m_Help;
-   int m_nCurrentCategory;
    int m_nCurrentLevel;
    struct Background* m_pBackground;
    Font *m_pFont;
@@ -43,6 +29,8 @@ struct MainMenu
    struct Config* m_pConfig;//Does not own
    struct SDL_Surface* m_pScreen;//Does not own
    struct SDL_Surface* m_pTitle;
+   int m_nDimension;
+   enum MathOperation m_eOperations;
 };
 
 void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pConfig, struct SDL_Surface* pScreen);

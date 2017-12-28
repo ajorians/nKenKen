@@ -26,6 +26,10 @@ void CreateHinter(struct EquationHinter** ppHinter, struct SDL_Surface* pScreen,
 void FreeHinter(struct EquationHinter** ppHinter)
 {
    struct EquationHinter* pHinter = *ppHinter;
+
+   if (pHinter == NULL)
+      return;
+
    pHinter->m_pScreen = NULL;//Does not own
    pHinter->m_KenKen = NULL;//Does not own
    pHinter->m_pConfig = NULL;//Does not own
@@ -40,6 +44,9 @@ void FreeHinter(struct EquationHinter** ppHinter)
 
 void StartEquationHinting(struct EquationHinter* pHinter, int x, int y, int nForced)
 {
+   if (pHinter == NULL)
+      return;
+
    if (nForced == 0 && KenKenSpotShareSameEquation(pHinter->m_KenKen, pHinter->m_nX, pHinter->m_nY, x, y) == KENKENLIB_SHARE_EQUATION)
    {
       pHinter->m_nX = x;
@@ -214,6 +221,9 @@ void FigureEquations(struct EquationHinter* pHinter, enum MathOperation eOperati
 //This is called on loop updates so don't do much each time called but accumulate information
 void ProcessHinter(struct EquationHinter* pHinter)
 {
+   if (pHinter == NULL)
+      return;
+
    if (pHinter->m_eStatus == FinishedEquation)
       return;
 
@@ -355,6 +365,8 @@ void ProcessHinter(struct EquationHinter* pHinter)
 
 void DrawHinter(struct EquationHinter* pHinter)
 {
+   if (pHinter == NULL)
+      return;
    DrawText(pHinter->m_pScreen, g_pFontHint, 0, SCREEN_HEIGHT-15, pHinter->m_DisplayBuffer, 0, 0, 0);
 }
 

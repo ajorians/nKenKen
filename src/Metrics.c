@@ -10,7 +10,7 @@
 #define MARGIN_LEFT		(2)
 #define MARGIN_TOP		(2)
 
-void CreateMetrics(struct Metrics** ppMetrics, KenKenLib KenKen)
+void CreateMetrics(struct Metrics** ppMetrics, KenKenLib KenKen, struct Config* pConfig)
 {
    *ppMetrics = malloc(sizeof(struct Metrics));
    struct Metrics* pMetrics = *ppMetrics;
@@ -19,8 +19,12 @@ void CreateMetrics(struct Metrics** ppMetrics, KenKenLib KenKen)
    int nWidth = GetKenKenWidth(KenKen);
    int nHeight = GetKenKenHeight(KenKen);
 
+   int nSpaceForHints = 15;
+   if (GetEquationHint(pConfig) != 1)
+      nSpaceForHints = 0;
+
    int nMaxPieceWidth = (SCREEN_WIDTH - (MARGIN_LEFT*2)) / nWidth;
-   int nMaxPieceHeight = (SCREEN_HEIGHT - (MARGIN_TOP*2) - 15) / nHeight;
+   int nMaxPieceHeight = (SCREEN_HEIGHT - (MARGIN_TOP*2) - nSpaceForHints) / nHeight;
 
    pMetrics->m_nPieceWidth = nMaxPieceWidth;
    pMetrics->m_nPieceHeight = nMaxPieceHeight;

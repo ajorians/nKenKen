@@ -79,9 +79,11 @@ void UpdateHelpDisplay(struct Help* pHelp)
    SDL_FillRect(pHelp->m_pScreen, &DestRect, SDL_MapRGB(pHelp->m_pScreen->format, 0x87, 0xCE, 0xEB));
 
    DrawText(pHelp->m_pScreen, pHelp->m_pFont, 10, 10, 
-"Help:\n\
-\n\
-NEEDS TO BE UPDATED!!", 255, 255, 255);
+"How to play:\n\
+Each cell needs a value from 1 to the dimension\n\
+of the game.  Every row and every column consists\n\
+of unique values.  The equation seen of cells must\n\
+be satisfied using the operation of the values given.", 255, 255, 255);
 
    SDL_UpdateRect(pHelp->m_pScreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }

@@ -67,14 +67,10 @@ int PollOptionsEvents(struct Options* pOptions)
                case SDLK_RETURN:
                case SDLK_LCTRL:
                   if (pOptions->m_nCurrentOption == 0) {
-#ifdef _TINSPIRE
-                     SetLockHint(pOptions->m_pConfig, GetLockHint(pOptions->m_pConfig) == 1 ? 0 : 1);
-#endif
+                     SetEquationHint(pOptions->m_pConfig, GetEquationHint(pOptions->m_pConfig) == 1 ? 0 : 1);
                   }
                   else if (pOptions->m_nCurrentOption == 1) {
-#ifdef _TINSPIRE
                      SetDrawBackground(pOptions->m_pConfig, GetDrawBackground(pOptions->m_pConfig) == 1 ? 0 : 1);
-#endif
                   }
                   break;
 
@@ -125,31 +121,26 @@ void UpdateOptionsDisplay(struct Options* pOptions)
    
     DrawText(pOptions->m_pScreen, pOptions->m_pFont, 10, 10,  "Options:", 255, 255, 255);
     
-    DrawText(pOptions->m_pScreen, pOptions->m_pFont, 10, 30,  "Red text lock hints:", 255, 255, 255);
-#ifdef _TINSPIRE
-    if( GetLockHint(pOptions->m_pConfig) == 1 ) {
+    DrawText(pOptions->m_pScreen, pOptions->m_pFont, 10, 30,  "Display equation hints:", 255, 255, 255);
+    if( GetEquationHint(pOptions->m_pConfig) == 1 ) {
        DrawText(pOptions->m_pScreen, pOptions->m_pFont, 180, 30,  "On", 255, 255, 255);
     } else {
        DrawText(pOptions->m_pScreen, pOptions->m_pFont, 180, 30,  "Off", 255, 255, 255);
     }
-#endif
     
     if( pOptions->m_nCurrentOption == 0 )
        draw_rectangle(pOptions->m_pScreen, SDL_MapRGB(pOptions->m_pScreen->format, 255, 0, 0), 8, 25, 210, 22, 1);
     
     DrawText(pOptions->m_pScreen, pOptions->m_pFont, 10, 50,  
-"When you lock a cell's value\n\
-numbers on cells in that row/column\n\
-are marked red.", 255, 255, 255);
+"The possible values for a set of\n\
+cells displayed below the game board.", 255, 255, 255);
 
     DrawText(pOptions->m_pScreen, pOptions->m_pFont, 10, 110, "Animated background:", 255, 255, 255);
-#ifdef _TINSPIRE
     if( GetDrawBackground(pOptions->m_pConfig) == 1 ) {
        DrawText(pOptions->m_pScreen, pOptions->m_pFont, 180, 110, "On", 255, 255, 255);
     } else {
        DrawText(pOptions->m_pScreen, pOptions->m_pFont, 180, 110, "Off", 255, 255, 255);
     }
-#endif
     
     DrawText(pOptions->m_pScreen, pOptions->m_pFont, 10, 130,
 "Whether the background moves\n\

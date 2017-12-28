@@ -1,18 +1,23 @@
 #ifdef _TINSPIRE
 #include <os.h>
+#else
+#include <stdio.h>
+#include <stdlib.h>
+#endif
 #include "Config.h"
 
 void CreateConfig(struct Config** ppConfig)
 {
    *ppConfig = malloc(sizeof(struct Config));
 
-   struct Config* pConfig = *ppConfig;
+   struct Config* pConfig = (*ppConfig);
    for(int nLevel = 0; nLevel<(int)(sizeof(pConfig->m_nBeatLevels)/sizeof(pConfig->m_nBeatLevels[0])); nLevel++)
       pConfig->m_nBeatLevels[nLevel] = 0;
 
    pConfig->m_nDrawBackground = 1;
-   pConfig->m_nLockHint = 0;
+   pConfig->m_nEquationHint = 1;
 
+#ifdef _TINSPIRE
    pConfig->m_Archive = NULL;
    ArchiveCreate(&pConfig->m_Archive);
 
@@ -38,11 +43,12 @@ void CreateConfig(struct Config** ppConfig)
          pConfig->m_nDrawBackground = atoi( GetValue(pConfig->m_Archive, "Settings", i) );
       }
 
-      sprintf(buffer, "LockHint");
+      sprintf(buffer, "EquationHint");
       if( strcmp(strName, buffer) == 0 ) {
-         pConfig->m_nLockHint = atoi( GetValue(pConfig->m_Archive, "Settings", i) );
+         pConfig->m_nEquationHint = atoi( GetValue(pConfig->m_Archive, "Settings", i) );
       }
    }
+#endif
 }
 
 void FreeConfig(struct Config** ppConfig)
@@ -50,6 +56,7 @@ void FreeConfig(struct Config** ppConfig)
    char buffer[8];
    char bufferName[8];
    struct Config* pConfig = *ppConfig;
+#ifdef _TINSPIRE
    ArchiveSetBatchMode(pConfig->m_Archive, ARCHIVE_ENABLE_BATCH);
    for(int nLevel=0; nLevel<(int)(sizeof(pConfig->m_nBeatLevels)/sizeof(pConfig->m_nBeatLevels[0])); nLevel++) {
       sprintf(buffer, "%d", pConfig->m_nBeatLevels[nLevel]);
@@ -61,13 +68,14 @@ void FreeConfig(struct Config** ppConfig)
    sprintf(bufferName, "DrawBkg", pConfig->m_nDrawBackground);
    UpdateArchiveEntry(pConfig->m_Archive, "Settings", bufferName, buffer, NULL);
 
-   sprintf(buffer, "%d", pConfig->m_nLockHint);
-   strcpy(bufferName, "LockHint");
+   sprintf(buffer, "%d", pConfig->m_nEquationHint);
+   strcpy(bufferName, "EquationHint");
    UpdateArchiveEntry(pConfig->m_Archive, "Settings", bufferName, buffer, NULL);
 
    ArchiveSetBatchMode(pConfig->m_Archive, ARCHIVE_DISABLE_BATCH);
 
    ArchiveFree(&pConfig->m_Archive);
+#endif
 
    free(*ppConfig);
    *ppConfig = NULL;
@@ -100,13 +108,12 @@ void SetDrawBackground(struct Config* pConfig, int nOn)
    pConfig->m_nDrawBackground = nOn;
 }
 
-int GetLockHint(struct Config* pConfig)
+int GetEquationHint(struct Config* pConfig)
 {
-   return pConfig->m_nLockHint;
+   return pConfig->m_nEquationHint;
 }
 
-void SetLockHint(struct Config* pConfig, int nOn)
+void SetEquationHint(struct Config* pConfig, int nOn)
 {
-   pConfig->m_nLockHint = nOn;
+   pConfig->m_nEquationHint = nOn;
 }
-#endif

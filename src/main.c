@@ -73,84 +73,73 @@ int main(int argc, char *argv[])
    }
 #endif
 
-//   int nLevelNumber = -1;
-//   char strLevelData[2048];
-//   struct Config* pConfig = NULL;
-//#ifdef _TINSPIRE
-//   CreateConfig(&pConfig);
-//#endif
-//   while(1) {
-//      int bShowHelp = 0, bShowOptions = 0;
-//      /*if( argc != 2 )*/ {
-//         struct MainMenu* pMenu = NULL;
-//         int bShouldQuit = 0;
-//         CreateMainMenu(&pMenu, nLevelNumber, pConfig, pScreen);
-//         while(MainMenuLoop(pMenu)){}
-//         bShouldQuit = MainMenuShouldQuit(pMenu);
-//         bShowOptions = MainMenuShowOptions(pMenu);
-//         bShowHelp = MainMenuShowHelp(pMenu);
-//         if( bShouldQuit == 0 && bShowOptions == 0 && bShowHelp == 0 ) {
-//            nLevelNumber = MainMenuGetLevelNum(pMenu);
-//	    printf("Loading level: %d\n", nLevelNumber);
-//            LevelLoad(strLevelData, nLevelNumber);
-//         }
-//         FreeMainMenu(&pMenu);
-//
-//         if( bShouldQuit )
-//            break;
-//      }
-//      /*else {
-//         FILE *fp = fopen(argv[1], "r");
-//         if (!fp) { return 0; }
-//         struct stat filestat;
-//         if (stat(argv[1],&filestat) == -1) { fclose(fp); return 0; }
-//
-//         fread(strLevelData, 1, filestat.st_size, fp);
-//
-//         strLevelData[filestat.st_size] = 0;
-//
-//         fclose(fp);
-//      }*/
-//
-//      if( bShowOptions ) {
-//         struct Options* pOptions = NULL;
-//         CreateOptions(&pOptions, pConfig, pScreen);
-//         while(OptionsLoop(pOptions)){}
-//         FreeOptions(&pOptions);
-//         continue;
-//      }
-//      else if( bShowHelp ) {
-//         struct Help* pHelp = NULL;
-//         CreateHelp(&pHelp, pScreen);
-//         while(HelpLoop(pHelp)){}
-//         FreeHelp(&pHelp);
-//         continue;
-//      }
-//      else {
-//         struct Game* pGame = NULL;
-//         int bShouldQuit = 0;
-//         CreateGame(&pGame, strLevelData, nLevelNumber, pConfig, pScreen);
-//         while(GameLoop(pGame)){}
-//         bShouldQuit = GameShouldQuit(pGame);
-//         FreeGame(&pGame);
-//
-//         if( bShouldQuit )
-//            break;
-//         if( nLevelNumber == -1 )
-//            break;
-//      }
-//   }
-   struct Game* pGame = NULL;
+   int nLevelNumber = -1;
    char strLevelData[2048];
-   LevelLoad(strLevelData, 1);
-   CreateGame(&pGame, strLevelData, 1, NULL, pScreen);
-   while(GameLoop(pGame)){}
-   //bShouldQuit = GameShouldQuit(pGame);
-   FreeGame(&pGame);
+   struct Config* pConfig = NULL;
+   CreateConfig(&pConfig);
+   while(1) {
+      int bShowHelp = 0, bShowOptions = 0;
+      /*if( argc != 2 )*/ {
+         struct MainMenu* pMenu = NULL;
+         int bShouldQuit = 0;
+         CreateMainMenu(&pMenu, nLevelNumber, pConfig, pScreen);
+         while(MainMenuLoop(pMenu)){}
+         bShouldQuit = MainMenuShouldQuit(pMenu);
+         bShowOptions = MainMenuShowOptions(pMenu);
+         bShowHelp = MainMenuShowHelp(pMenu);
+         if( bShouldQuit == 0 && bShowOptions == 0 && bShowHelp == 0 ) {
+            nLevelNumber = MainMenuGetLevelNum(pMenu);
+	    printf("Loading level: %d\n", nLevelNumber);
+            LevelLoad(strLevelData, nLevelNumber);
+         }
+         FreeMainMenu(&pMenu);
 
-#ifdef _TINSPIRE
-   //FreeConfig(&pConfig);
-#endif
+         if( bShouldQuit )
+            break;
+      }
+      /*else {
+         FILE *fp = fopen(argv[1], "r");
+         if (!fp) { return 0; }
+         struct stat filestat;
+         if (stat(argv[1],&filestat) == -1) { fclose(fp); return 0; }
+
+         fread(strLevelData, 1, filestat.st_size, fp);
+
+         strLevelData[filestat.st_size] = 0;
+
+         fclose(fp);
+      }*/
+
+      if( bShowOptions ) {
+         struct Options* pOptions = NULL;
+         CreateOptions(&pOptions, pConfig, pScreen);
+         while(OptionsLoop(pOptions)){}
+         FreeOptions(&pOptions);
+         continue;
+      }
+      else if( bShowHelp ) {
+         struct Help* pHelp = NULL;
+         CreateHelp(&pHelp, pScreen);
+         while(HelpLoop(pHelp)){}
+         FreeHelp(&pHelp);
+         continue;
+      }
+      else {
+         struct Game* pGame = NULL;
+         int bShouldQuit = 0;
+         CreateGame(&pGame, strLevelData, nLevelNumber, pConfig, pScreen);
+         while(GameLoop(pGame)){}
+         bShouldQuit = GameShouldQuit(pGame);
+         FreeGame(&pGame);
+
+         if( bShouldQuit )
+            break;
+         if( nLevelNumber == -1 )
+            break;
+      }
+   }
+
+   FreeConfig(&pConfig);
 
    printf("Quitting SDL.\n");
 
