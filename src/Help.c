@@ -80,10 +80,17 @@ void UpdateHelpDisplay(struct Help* pHelp)
 
    DrawText(pHelp->m_pScreen, pHelp->m_pFont, 10, 10, 
 "How to play:\n\
-Each cell needs a value from 1 to the dimension\n\
-of the game.  Every row and every column consists\n\
-of unique values.  The equation seen of cells must\n\
-be satisfied using the operation of the values given.", 255, 255, 255);
+Each cell needs a value from 1 to the\n\
+dimension of the game board.  Every\n\
+row and every column consists of unique\n\
+values.  Also using the values with the\n\
+mathematical notation indicated must\n\
+result in the value indicated.\n\
+\n\
+The order the math is applied might be\n\
+right to left or bottom up.\n\
+\n\
+Have fun!", 255, 255, 255);
 
    SDL_UpdateRect(pHelp->m_pScreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }

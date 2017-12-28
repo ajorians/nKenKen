@@ -115,7 +115,7 @@ void DrawBoard(struct Game* pGame)
 
 void UpdateGameWon(struct Game* pGame)
 {
-   if( pGame->m_bWon && pGame->m_nLevelNum > 0 && pGame->m_nLevelNum <= 56 ) {
+   if( pGame->m_bWon && pGame->m_nLevelNum > 0 && pGame->m_nLevelNum <= 250 ) {
 #ifdef _TINSPIRE
       SetBeatLevel(pGame->m_pConfig, pGame->m_nLevelNum-1/*To 0-base*/, 1);
 #endif
@@ -161,16 +161,14 @@ int GamePollEvents(struct Game* pGame)
 		  }
                   break;
 
-               case SDLK_RETURN:
+               /*case SDLK_RETURN:
                case SDLK_LCTRL:
                case SDLK_RCTRL:
 		  if( pGame->m_bWon != 1 ) {
-                     //ToggleCrossCellValue(pGame->m_Cross, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector));
-
 		     pGame->m_bWon = IsKenKenGameOver(pGame->m_KenKen);
 		     UpdateGameWon(pGame);
 		  }
-                  break;
+                  break;*/
 
                case SDLK_0:
                case SDLK_1:

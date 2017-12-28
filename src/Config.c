@@ -16,6 +16,7 @@ void CreateConfig(struct Config** ppConfig)
 
    pConfig->m_nDrawBackground = 1;
    pConfig->m_nEquationHint = 1;
+   pConfig->m_nLastLevel = 0;
 
 #ifdef _TINSPIRE
    pConfig->m_Archive = NULL;
@@ -27,7 +28,7 @@ void CreateConfig(struct Config** ppConfig)
    for(int i=0; i<nSettings; i++) {
       strcpy(strName, GetName(pConfig->m_Archive, "Settings", i));
 
-      char buffer[8];
+      char buffer[16];
 
       for(int nLevel = 0; nLevel<(int)(sizeof(pConfig->m_nBeatLevels)/sizeof(pConfig->m_nBeatLevels[0])); nLevel++) {
          sprintf(buffer, "Level%d", nLevel);
@@ -38,14 +39,19 @@ void CreateConfig(struct Config** ppConfig)
          }
       }
 
-      sprintf(buffer, "DrawBkg");
+      strcpy(buffer, "DrawBkg");
       if( strcmp(strName, buffer) == 0 ) {
          pConfig->m_nDrawBackground = atoi( GetValue(pConfig->m_Archive, "Settings", i) );
       }
 
-      sprintf(buffer, "EquationHint");
+      strcpy(buffer, "EquationHint");
       if( strcmp(strName, buffer) == 0 ) {
          pConfig->m_nEquationHint = atoi( GetValue(pConfig->m_Archive, "Settings", i) );
+      }
+
+      strcpy(buffer, "LastLevel");
+      if( strcmp(strName, buffer) == 0 ) {
+         pConfig->m_nLastLevel = atoi( GetValue(pConfig->m_Archive, "Settings", i) );
       }
    }
 #endif
@@ -53,8 +59,8 @@ void CreateConfig(struct Config** ppConfig)
 
 void FreeConfig(struct Config** ppConfig)
 {
-   char buffer[8];
-   char bufferName[8];
+   char buffer[16];
+   char bufferName[16];
    struct Config* pConfig = *ppConfig;
 #ifdef _TINSPIRE
    ArchiveSetBatchMode(pConfig->m_Archive, ARCHIVE_ENABLE_BATCH);
@@ -65,11 +71,15 @@ void FreeConfig(struct Config** ppConfig)
    }
 
    sprintf(buffer, "%d", pConfig->m_nDrawBackground);
-   sprintf(bufferName, "DrawBkg", pConfig->m_nDrawBackground);
+   strcpy(bufferName, "DrawBkg");
    UpdateArchiveEntry(pConfig->m_Archive, "Settings", bufferName, buffer, NULL);
 
    sprintf(buffer, "%d", pConfig->m_nEquationHint);
    strcpy(bufferName, "EquationHint");
+   UpdateArchiveEntry(pConfig->m_Archive, "Settings", bufferName, buffer, NULL);
+
+   sprintf(buffer, "%d", pConfig->m_nLastLevel);
+   strcpy(bufferName, "LastLevel");
    UpdateArchiveEntry(pConfig->m_Archive, "Settings", bufferName, buffer, NULL);
 
    ArchiveSetBatchMode(pConfig->m_Archive, ARCHIVE_DISABLE_BATCH);
@@ -96,6 +106,16 @@ int GetBeatLevel(struct Config* pConfig, int nLevelNum)
       nRet = pConfig->m_nBeatLevels[nLevelNum];
    
    return nRet;
+}
+
+void SetLastLevel(struct Config* pConfig, int nLastLevelNum)
+{
+   pConfig->m_nLastLevel = nLastLevelNum;
+}
+
+int GetLastLevel(struct Config* pConfig)
+{
+   return pConfig->m_nLastLevel;
 }
 
 int GetDrawBackground(struct Config* pConfig)

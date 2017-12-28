@@ -9,7 +9,7 @@
 #include "Config.h"
 #include "Font.h"
 #include "StarDrawer.h"
-#include <KenKenLib\KenKenLib.h>
+#include <KenKenLib/KenKenLib.h>
 
 enum MenuChoice
 {

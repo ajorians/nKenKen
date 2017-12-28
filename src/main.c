@@ -77,9 +77,10 @@ int main(int argc, char *argv[])
    char strLevelData[2048];
    struct Config* pConfig = NULL;
    CreateConfig(&pConfig);
+   nLevelNumber = GetLastLevel(pConfig);
    while(1) {
       int bShowHelp = 0, bShowOptions = 0;
-      /*if( argc != 2 )*/ {
+      if( argc != 2 ) {
          struct MainMenu* pMenu = NULL;
          int bShouldQuit = 0;
          CreateMainMenu(&pMenu, nLevelNumber, pConfig, pScreen);
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
          if( bShouldQuit )
             break;
       }
-      /*else {
+      else {
          FILE *fp = fopen(argv[1], "r");
          if (!fp) { return 0; }
          struct stat filestat;
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
          strLevelData[filestat.st_size] = 0;
 
          fclose(fp);
-      }*/
+      }
 
       if( bShowOptions ) {
          struct Options* pOptions = NULL;

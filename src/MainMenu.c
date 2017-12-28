@@ -32,7 +32,7 @@ void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pCon
    CreateStarDrawer( &pMenu->m_pStarDrawer );
 
 #ifdef _TINSPIRE
-   pMenu->m_pTitle = nSDL_LoadImage(image_Title);
+   pMenu->m_pTitle = nSDL_LoadImage(image_KenKen);
 #endif
 }
 
@@ -78,6 +78,7 @@ int PollEvents(struct MainMenu* pMenu)
                if (pMenu->m_eChoice == Play) {
                   if (pMenu->m_nCurrentLevel > 1) {
                      pMenu->m_nCurrentLevel--;
+		     SetLastLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel);
                      UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
                   }
                }
@@ -91,6 +92,7 @@ int PollEvents(struct MainMenu* pMenu)
                if (pMenu->m_eChoice == Play) {
                   if (pMenu->m_nCurrentLevel < 249) {
                      pMenu->m_nCurrentLevel++;
+		     SetLastLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel);
                      UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
                   }
                }
@@ -175,55 +177,68 @@ void UpdateDisplay(struct MainMenu* pMenu)
    IntToA(levelNumBuffer, 4, pMenu->m_nCurrentLevel);
 
    char buffer[16];
-   StringCopy(buffer, 16, "Level #");
+   StringCopy(buffer, 16, "");
+   //StringCopy(buffer, 16, "Level #");
    StringAppend(buffer, 16, levelNumBuffer);
 
-   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH/2 - 15, SCREEN_HEIGHT/2 - 7, buffer, 0, 0, 0);
+   int x = SCREEN_WIDTH/2;
+   int y = SCREEN_HEIGHT/2 - 34;
+
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, x, y, buffer, 0, 0, 0);
+
+   if( GetBeatLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel-1/*ToBase 0*/) == 1 )
+      DrawStar(pMenu->m_pStarDrawer, pMenu->m_pScreen, x+21, y-5);
 
    IntToA(levelNumBuffer, 4, pMenu->m_nDimension);
    StringCopy(buffer, 16, "");
    StringAppend(buffer, 16, levelNumBuffer);
    StringAppend(buffer, 16, " x ");
    StringAppend(buffer, 16, levelNumBuffer);
-   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT / 2 + 5, buffer, 0, 0, 0);
+   x += 31;
+   y += 16;
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, x, y, buffer, 0, 0, 0);
 
    StringCopy(buffer, 16, "");
-   if( (pMenu->m_eOperations & AddOperation) == AddOperation)
-      StringAppend(buffer, 16, "+");
-   if ((pMenu->m_eOperations & SubtractOperation) == SubtractOperation)
-      StringAppend(buffer, 16, "-");
-   if ((pMenu->m_eOperations & MultiplyOperation) == MultiplyOperation)
-      StringAppend(buffer, 16, "x");
-   if ((pMenu->m_eOperations & DivideOperation) == DivideOperation)
+   if( (pMenu->m_eOperations & AddOperation) == AddOperation) {
+      StringAppend(buffer, 16, "+ ");
+   }
+   if ((pMenu->m_eOperations & SubtractOperation) == SubtractOperation) {
+      StringAppend(buffer, 16, "- ");
+   }
+   if ((pMenu->m_eOperations & MultiplyOperation) == MultiplyOperation){
+      StringAppend(buffer, 16, "x ");
+   }
+   if ((pMenu->m_eOperations & DivideOperation) == DivideOperation) {
       StringAppend(buffer, 16, "/");
-   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH / 2 - 10, SCREEN_HEIGHT / 2 + 20, buffer, 0, 0, 0);
+   }
 
-   DrawText(pMenu->m_pScreen, pMenu->m_pFont, 0, SCREEN_HEIGHT - 17, "Options", 0, 0, 0);
-   DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH - 50, SCREEN_HEIGHT - 17, "Help", 0, 0, 0);
+   x -= 0;
+   y += 14;
+   DrawText(pMenu->m_pScreen, pMenu->m_pFont, x, y, buffer, 0, 0, 0);
+
+   //DrawText(pMenu->m_pScreen, pMenu->m_pFont, 20, SCREEN_HEIGHT - 27, "Options", 0, 0, 0);
+   //DrawText(pMenu->m_pScreen, pMenu->m_pFont, SCREEN_WIDTH - 50, SCREEN_HEIGHT - 27, "Help", 0, 0, 0);
 
    int r = 255, g = 0, b = 0, a = 200;
 
-   int left = SCREEN_WIDTH / 2 - 16;
-   int top = SCREEN_HEIGHT / 2 - 15;
-   int right = left + 60;
-   int bottom = top + 60;
-
-   if( GetBeatLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel) == 1 )
-      DrawStar(pMenu->m_pStarDrawer, pMenu->m_pScreen, left - 20, top);
+   int left = SCREEN_WIDTH / 2 - 50;
+   int top = SCREEN_HEIGHT / 2 - 45;
+   int right = left + 133;
+   int bottom = top + 78;
 
    if (pMenu->m_eChoice == Options)
    {
-      left = 0;
-      top = SCREEN_HEIGHT - 20;
-      right = left + 40;
-      bottom = SCREEN_HEIGHT;
+      left = 7;
+      top = SCREEN_HEIGHT - 32;
+      right = left + 80;
+      bottom = SCREEN_HEIGHT-5;
    }
    else if (pMenu->m_eChoice == Help)
    {
-      left = SCREEN_WIDTH - 50;
-      top = SCREEN_HEIGHT - 20;
-      right = SCREEN_WIDTH;
-      bottom = SCREEN_HEIGHT;
+      left = SCREEN_WIDTH - 60;
+      top = SCREEN_HEIGHT - 32;
+      right = SCREEN_WIDTH-7;
+      bottom = SCREEN_HEIGHT-5;
    }
 
    //Top
