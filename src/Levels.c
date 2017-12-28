@@ -255,6 +255,7 @@ void LevelLoad(char* pstr, int nLevelNum)
       LEVEL(247);
       LEVEL(248);
       LEVEL(249);
+      LEVEL(250);
    }
 }
 
