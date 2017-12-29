@@ -77,10 +77,10 @@ int main(int argc, char *argv[])
    char strLevelData[2048];
    struct Config* pConfig = NULL;
    CreateConfig(&pConfig);
-   nLevelNumber = GetLastLevel(pConfig);
    while(1) {
       int bShowHelp = 0, bShowOptions = 0;
       if( argc != 2 ) {
+         nLevelNumber = GetLastLevel(pConfig);
          struct MainMenu* pMenu = NULL;
          int bShouldQuit = 0;
          CreateMainMenu(&pMenu, nLevelNumber, pConfig, pScreen);

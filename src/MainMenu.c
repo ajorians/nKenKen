@@ -26,7 +26,6 @@ void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pCon
 
    UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
 
-   CreateBackground(&(pMenu->m_pBackground), pMenu->m_pScreen, pMenu->m_pConfig, 0);
    pMenu->m_pFont = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
 
    CreateStarDrawer( &pMenu->m_pStarDrawer );
@@ -40,7 +39,6 @@ void FreeMainMenu(struct MainMenu** ppMenu)
 {
    struct MainMenu* pMenu = *ppMenu;
 
-   FreeBackground(&pMenu->m_pBackground);
    FreeFont(pMenu->m_pFont);
 
    FreeStarDrawer( &pMenu->m_pStarDrawer );
@@ -146,8 +144,6 @@ void UpdateDimensionAndOperations(struct MainMenu* pMenu, int nLevelNum)
 
 void UpdateDisplay(struct MainMenu* pMenu)
 {
-   DrawBackground(pMenu->m_pBackground);
-
 #if 0
    SDL_Rect DestRect;
    DestRect.x = 0;

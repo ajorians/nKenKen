@@ -7,14 +7,24 @@
 #include "SDL/SDL.h"
 #include "Config.h"
 
+#define NUM_SQUARES (35)
+
+struct Square {
+   int x;
+   int y;
+   int size;
+   int r;
+   int g;
+   int b;
+   int direction;
+   int move;
+};
+
 struct Background
 {
    struct SDL_Surface* m_pScreen;//Does not own
    struct Config*      m_pConfig;//Does not own
-   int m_nX;
-   int* m_nArr;
-   int m_nNumSquares;
-   int m_nAllowMovement;
+   struct Square m_ArrSquares[NUM_SQUARES];
 };
 
 void CreateBackground(struct Background** ppBackground, struct SDL_Surface* pScreen, struct Config* pConfig, int nAllowMovement);

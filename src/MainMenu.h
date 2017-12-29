@@ -23,7 +23,6 @@ struct MainMenu
 {
    enum MenuChoice m_eChoice;
    int m_nCurrentLevel;
-   struct Background* m_pBackground;
    Font *m_pFont;
    struct StarDrawer* m_pStarDrawer;
    struct Config* m_pConfig;//Does not own

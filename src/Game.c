@@ -82,8 +82,10 @@ void FreeGame(struct Game** ppGame)
 
 void DrawBoard(struct Game* pGame)
 {
-   DrawBackground(pGame->m_pBackground);
+   SDL_FillRect(pGame->m_pScreen, NULL, SDL_MapRGB(pGame->m_pScreen->format, 255, 255, 255));
 
+   DrawBackground(pGame->m_pBackground);
+   
    int nWidth = GetKenKenWidth(pGame->m_KenKen);
    int nHeight = GetKenKenHeight(pGame->m_KenKen);
 
