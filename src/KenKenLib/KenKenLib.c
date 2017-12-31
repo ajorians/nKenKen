@@ -19,7 +19,6 @@
 
 struct KenKenEquation
 {
-   /*int m_nID;*/
    int m_nValue;
    enum MathOperation m_eOperation;
 };
@@ -64,12 +63,22 @@ struct KenKenEquation* GetEquation(struct KenKenEquation* pEquation, int nID)
    return pEq;
 }
 
+struct KenKenAction
+{
+   int x;
+   int y;
+   int value;
+   struct KenKenAction* m_pNext;
+};
+
 struct KenKen
 {
    int m_nLastError;
    int m_nNumEquations;
    struct KenKenBoard* m_pBoard;
    struct KenKenEquation* m_pEquations;
+   struct KenKenAction* m_pUndoActions;
+   struct KenKenAction* m_pRedoActions;
 };
 
 void Cleanup(struct KenKen** ppK)
@@ -268,6 +277,9 @@ int KenKenLibCreate(KenKenLib* api, const char* pstrFile)
       }
    }
 
+   pK->m_pUndoActions = NULL;
+   pK->m_pRedoActions = NULL;
+
    pK->m_nLastError = KENKENLIB_OK;
    *api = pK;
 
@@ -280,6 +292,9 @@ int KenKenLibFree(KenKenLib* api)
    DEBUG_FUNC_NAME;
 
    pK = *api;
+
+   ClearUndos(*api);
+   ClearRedos(*api);
 
    if( pK->m_pBoard != NULL ) {
       free(pK->m_pBoard);
@@ -366,6 +381,120 @@ int IsKenKenGameOver(KenKenLib api)
    return KENKENLIB_GAMEOVER;
 }
 
+void ClearUndos(KenKenLib api)
+{
+   DEBUG_FUNC_NAME;
+
+   struct KenKen* pK = (struct KenKen*)api;
+
+   struct KenKenAction* pCurrent = pK->m_pUndoActions;
+   while(pCurrent != NULL) {
+      struct KenKenAction* pTemp = pCurrent;
+      pCurrent = pCurrent->m_pNext;
+      free(pTemp);
+      pTemp = NULL;
+      pK->m_pUndoActions = pCurrent;
+   }
+}
+
+void ClearRedos(KenKenLib api)
+{
+   DEBUG_FUNC_NAME;
+
+   struct KenKen* pK = (struct KenKen*)api;
+
+   struct KenKenAction* pCurrent = pK->m_pRedoActions;
+   while(pCurrent != NULL) {
+      struct KenKenAction* pTemp = pCurrent;
+      pCurrent = pCurrent->m_pNext;
+      free(pTemp);
+      pTemp = NULL;
+      pK->m_pRedoActions = pCurrent;
+   }
+}
+
+void AddUndo(KenKenLib api, int x, int y, int value)
+{
+   DEBUG_FUNC_NAME;
+
+   struct KenKen* pK = (struct KenKen*)api;
+
+   struct KenKenAction* pAction = malloc(sizeof(struct KenKenAction));
+   if( pAction == NULL ) {
+      DEBUG_MSG("Out of memory: AddUndo\n");
+   //Assume allocated
+   }
+
+   pAction->x = x;
+   pAction->y = y;
+   pAction->value = value;
+
+   struct KenKenAction* pRoot = pK->m_pUndoActions;
+   pAction->m_pNext = pRoot;
+   pK->m_pUndoActions = pAction;
+}
+
+void AddRedo(KenKenLib api, int x, int y, int value)
+{
+   DEBUG_FUNC_NAME;
+
+   struct KenKen* pK = (struct KenKen*)api;
+
+   struct KenKenAction* pAction = malloc(sizeof(struct KenKenAction));
+   if( pAction == NULL ) {
+      DEBUG_MSG("Out of memory: AddRedo\n");
+      //Assume allocated
+   }
+
+   pAction->x = x;
+   pAction->y = y;
+   pAction->value = value;
+
+   struct KenKenAction* pRoot = pK->m_pRedoActions;
+   pAction->m_pNext = pRoot;
+   pK->m_pRedoActions = pAction;
+}
+
+int KenKenUndo(KenKenLib api)
+{
+   DEBUG_FUNC_NAME;
+
+   struct KenKen* pK = (struct KenKen*)api;
+
+   struct KenKenAction* pRoot = pK->m_pUndoActions;
+   if( pRoot == NULL )
+      return KENKENLIB_CANNOT_UNDO;
+
+   pK->m_pUndoActions = pRoot->m_pNext;
+   AddRedo(api, pRoot->x, pRoot->y, GetKenKenSpotValue(api, pRoot->x, pRoot->y));
+   GetAt(pK->m_pBoard, pRoot->x, pRoot->y)->m_nValue = pRoot->value;
+
+   free(pRoot);
+   pRoot = NULL;
+
+   return KENKENLIB_OK;
+}
+
+int KenKenRedo(KenKenLib api)
+{
+   DEBUG_FUNC_NAME;
+
+   struct KenKen* pK = (struct KenKen*)api;
+
+   struct KenKenAction* pRoot = pK->m_pRedoActions;
+   if( pRoot == NULL )
+      return KENKENLIB_CANNOT_REDO;
+
+   pK->m_pRedoActions = pRoot->m_pNext;
+   AddUndo(api, pRoot->x, pRoot->y, GetKenKenSpotValue(api, pRoot->x, pRoot->y));
+   GetAt(pK->m_pBoard, pRoot->x, pRoot->y)->m_nValue = pRoot->value;
+
+   free(pRoot);
+   pRoot = NULL;
+
+   return KENKENLIB_OK;
+}
+
 int GetKenKenSpotValue(KenKenLib api, int x, int y)
 {
    struct KenKen* pK;
@@ -392,6 +521,10 @@ int SetKenKenSpotValue(KenKenLib api, int x, int y, int value)
    if (value < 0 || value > pK->m_pBoard->m_nWidth)
       return KENKENLIB_BADARGUMENT;
 
+   ClearRedos(api);
+
+   int nOldValue = GetAt(pK->m_pBoard, x, y)->m_nValue;
+   AddUndo(api, x, y, nOldValue);
    GetAt(pK->m_pBoard, x, y)->m_nValue = value;
 
    return KENKENLIB_OK;

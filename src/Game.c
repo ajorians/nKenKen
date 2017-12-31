@@ -124,6 +124,22 @@ void UpdateGameWon(struct Game* pGame)
    }
 }
 
+void Undo(struct Game* pGame)
+{
+   if( pGame->m_bWon )
+      return;
+
+   KenKenUndo(pGame->m_KenKen);
+}
+
+void Redo(struct Game* pGame)
+{
+   if( pGame->m_bWon )
+      return;
+
+   KenKenRedo(pGame->m_KenKen);
+}
+
 int GamePollEvents(struct Game* pGame)
 {
    SDL_Event event;
@@ -161,16 +177,13 @@ int GamePollEvents(struct Game* pGame)
                      Move(pGame->m_pSelector, Right);
                      StartEquationHinting(pGame->m_pEquationHinter, GetCurrentX(pGame->m_pSelector), GetCurrentY(pGame->m_pSelector), 0);
 		  }
+		  break;
+		case SDLK_PLUS:
+		  Redo(pGame);
+		  break;
+		case SDLK_MINUS:
+		  Undo(pGame);
                   break;
-
-               /*case SDLK_RETURN:
-               case SDLK_LCTRL:
-               case SDLK_RCTRL:
-		  if( pGame->m_bWon != 1 ) {
-		     pGame->m_bWon = IsKenKenGameOver(pGame->m_KenKen);
-		     UpdateGameWon(pGame);
-		  }
-                  break;*/
 
                case SDLK_0:
                case SDLK_1:

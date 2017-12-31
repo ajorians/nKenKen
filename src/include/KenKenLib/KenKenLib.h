@@ -21,6 +21,9 @@ typedef void* KenKenLib;
 #define KENKENLIB_EQUATION_SOLVED (1)
 #define KENKENLIB_EQUATION_NOT_SOLVED (0)
 
+#define KENKENLIB_CANNOT_UNDO	(1)
+#define KENKENLIB_CANNOT_REDO	(1)
+
 enum MathOperation
 {
    Add = 0,
@@ -52,6 +55,9 @@ void ClearKenKenLibError(KenKenLib api);
 int GetKenKenWidth(KenKenLib api);
 int GetKenKenHeight(KenKenLib api);
 int IsKenKenGameOver(KenKenLib api);
+
+int KenKenUndo(KenKenLib api);
+int KenKenRedo(KenKenLib api);
 
 int GetKenKenSpotValue(KenKenLib api, int x, int y);
 int SetKenKenSpotValue(KenKenLib api, int x, int y, int value);
