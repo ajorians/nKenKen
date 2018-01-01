@@ -177,20 +177,20 @@ void UpdateDisplay(struct MainMenu* pMenu)
    //StringCopy(buffer, 16, "Level #");
    StringAppend(buffer, 16, levelNumBuffer);
 
-   int x = SCREEN_WIDTH/2;
+   int x = SCREEN_WIDTH/2+15;
    int y = SCREEN_HEIGHT/2 - 34;
 
    DrawText(pMenu->m_pScreen, pMenu->m_pFont, x, y, buffer, 0, 0, 0);
 
    if( GetBeatLevel(pMenu->m_pConfig, pMenu->m_nCurrentLevel-1/*ToBase 0*/) == 1 )
-      DrawStar(pMenu->m_pStarDrawer, pMenu->m_pScreen, x+21, y-5);
+      DrawStar(pMenu->m_pStarDrawer, pMenu->m_pScreen, x+22, y-5);
 
    IntToA(levelNumBuffer, 4, pMenu->m_nDimension);
    StringCopy(buffer, 16, "");
    StringAppend(buffer, 16, levelNumBuffer);
    StringAppend(buffer, 16, " x ");
    StringAppend(buffer, 16, levelNumBuffer);
-   x += 31;
+   x += 0;
    y += 16;
    DrawText(pMenu->m_pScreen, pMenu->m_pFont, x, y, buffer, 0, 0, 0);
 
@@ -217,7 +217,7 @@ void UpdateDisplay(struct MainMenu* pMenu)
 
    int r = 255, g = 0, b = 0, a = 200;
 
-   int left = SCREEN_WIDTH / 2 - 50;
+   int left = SCREEN_WIDTH / 2 - 62;
    int top = SCREEN_HEIGHT / 2 - 45;
    int right = left + 133;
    int bottom = top + 78;
