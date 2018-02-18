@@ -12,6 +12,9 @@
 #include "Levels.h"
 #ifndef _TINSPIRE
 #include <SDL/SDL_ttf.h>
+#ifndef _WIN32
+#include <sys/stat.h>
+#endif
 #endif
 #include "Replacements.h"
 
@@ -42,8 +45,10 @@ int main(int argc, char *argv[])
    /* Initialize the SDL library (starts the event loop) */
    if ( SDL_Init(SDL_INIT_VIDEO ) < 0 )
    {
+#ifdef _TINSPIRE
       fprintf(stderr,
               "Couldn't initialize SDL: %s\n", SDL_GetError());
+#endif
       exit(1);
    }
 
@@ -56,7 +61,9 @@ int main(int argc, char *argv[])
 
    if( pScreen == NULL )
    {
+#ifdef _TINSPIRE
       fprintf(stderr, "Couldn't set %dx%dx%d video mode: %s\n", SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BIT_DEPTH, SDL_GetError());
+#endif
       exit(1);
    }
    else

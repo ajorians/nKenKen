@@ -3,6 +3,10 @@
 
 #include "ArchiveLib/ArchiveLib.h"
 
+#ifndef _TINSPIRE
+#include <stdio.h>
+#endif
+
 struct ArchiveEntry
 {
    char	 m_strName[MAX_NAME_LENGTH];

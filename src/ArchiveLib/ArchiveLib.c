@@ -1,6 +1,11 @@
 //Public domain :)
 
+#ifdef _TINSPIRE
 #include <os.h>
+#elif defined(_WIN32)
+#else
+#include <sys/stat.h>
+#endif
 #include "ArchiveLib/ArchiveLib.h"
 #include "ArchiveTable.h"
 #include "Defines.h"

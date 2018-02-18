@@ -26,7 +26,7 @@ void CreateMainMenu(struct MainMenu** ppMenu, int nLevelNum, struct Config* pCon
 
    UpdateDimensionAndOperations(pMenu, pMenu->m_nCurrentLevel);
 
-   pMenu->m_pFont = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
+   pMenu->m_pFont = LoadFont("arial.ttf", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
 
    CreateStarDrawer( &pMenu->m_pStarDrawer );
 

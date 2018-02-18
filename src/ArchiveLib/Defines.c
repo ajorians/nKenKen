@@ -1,4 +1,6 @@
+#ifdef _TINSPIRE
 #include <os.h>
+#endif
 #include "Defines.h"
 
 int Archive_Min(int a, int b) { return a<b ? a : b; }

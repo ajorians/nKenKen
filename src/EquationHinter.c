@@ -20,7 +20,7 @@ void CreateHinter(struct EquationHinter** ppHinter, struct SDL_Surface* pScreen,
    StringCopy(pHinter->m_DisplayBuffer, sizeof(pHinter->m_DisplayBuffer), "");
 
    if (g_pFontHint == NULL) {
-      g_pFontHint = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 0/*R*/, 0/*G*/, 0/*B*/, 12);
+      g_pFontHint = LoadFont("arial.ttf", NSDL_FONT_THIN, 0/*R*/, 0/*G*/, 0/*B*/, 12);
    }
 }
 

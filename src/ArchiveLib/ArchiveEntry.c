@@ -1,4 +1,6 @@
+#ifdef _TINSPIRE
 #include <os.h>
+#endif
 #include "ArchiveEntry.h"
 #include "Defines.h"
 

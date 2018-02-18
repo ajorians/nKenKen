@@ -17,11 +17,11 @@ void CreatePiece(struct Piece* pPiece, int x, int y, KenKenLib kenken, struct Me
    pPiece->m_pConfig = pConfig;
 
    if( g_pFont == NULL ) {
-      g_pFont = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 0/*R*/, 0/*G*/, 0/*B*/, 12);
+      g_pFont = LoadFont("arial.ttf", NSDL_FONT_THIN, 0/*R*/, 0/*G*/, 0/*B*/, 12);
    }
 
    if (g_pFontError == NULL) {
-      g_pFontError = LoadFont("ARIAL.TTF", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
+      g_pFontError = LoadFont("arial.ttf", NSDL_FONT_THIN, 255/*R*/, 0/*G*/, 0/*B*/, 12);
    }
 }
 
