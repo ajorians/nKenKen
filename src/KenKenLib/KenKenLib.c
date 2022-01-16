@@ -81,6 +81,9 @@ struct KenKen
    struct KenKenAction* m_pRedoActions;
 };
 
+void ClearUndos( KenKenLib api );
+void ClearRedos( KenKenLib api );
+
 void Cleanup(struct KenKen** ppK)
 {
    if( *ppK != NULL ) {

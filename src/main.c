@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
             break;
       }
       else {
+#ifndef _WIN32
          FILE *fp = fopen(argv[1], "r");
          if (!fp) { return 0; }
          struct stat filestat;
@@ -116,6 +117,7 @@ int main(int argc, char *argv[])
          strLevelData[filestat.st_size] = 0;
 
          fclose(fp);
+#endif
       }
 
       if( bShowOptions ) {
